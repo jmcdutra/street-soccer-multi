@@ -51,11 +51,11 @@ body {
     padding: 0;
     margin: 0;
     min-height: 100vh;
-    width: 100vw;
+    width: 100%;
     font-family: var(--font-standard);
     background-color: var(--bg);
     color: var(--text);
-    overflow: hidden;
+    overflow-x: hidden;
 }
 
 /* -------------------------------------- */
@@ -67,6 +67,8 @@ body:not(.arena-body) {
     color: #000;
     isolation: isolate;
     position: relative;
+    overflow-x: hidden;
+    overflow-y: auto;
 }
 
 body:not(.arena-body)::before {
@@ -111,14 +113,14 @@ body:not(.arena-body)::before {
 
 /* Main Layout */
 .habbo-lobby-container {
-    max-width: 1100px;
+    width: min(1100px, calc(100vw - 24px));
     margin: 0 auto;
-    height: 100vh;
+    min-height: 100svh;
     display: flex;
     flex-direction: column;
-    padding: 20px;
+    padding: clamp(10px, 2vw, 20px);
     box-sizing: border-box;
-    gap: 15px;
+    gap: clamp(10px, 1.8vw, 15px);
 }
 
 /* Header */
@@ -170,7 +172,8 @@ body:not(.arena-body)::before {
     display: flex;
     flex: 1;
     gap: 15px;
-    overflow: hidden;
+    min-height: 0;
+    overflow: visible;
 }
 
 /* Boxes */
@@ -197,7 +200,7 @@ body:not(.arena-body)::before {
 
 .habbo-box-title {
     font-family: var(--font-pixel);
-    font-size: 20px;
+    font-size: clamp(15px, 1.6vw, 20px);
     margin: 0;
     text-shadow: 1px 1px 0 #000;
 }
@@ -223,7 +226,7 @@ body:not(.arena-body)::before {
     align-items: center;
     gap: 10px;
     font-family: var(--font-pixel);
-    font-size: 18px;
+    font-size: clamp(14px, 1.8vw, 18px);
     box-shadow: inset 1px 1px 3px rgba(0,0,0,0.2);
 }
 
@@ -248,10 +251,12 @@ body:not(.arena-body)::before {
 .input-group {
     display: flex;
     gap: 10px;
+    align-items: stretch;
 }
 
 .habbo-form input {
     flex: 1;
+    min-width: 0;
     padding: 10px;
     border: 2px solid #000;
     border-radius: 4px;
@@ -270,7 +275,7 @@ body:not(.arena-body)::before {
     border: 2px solid #000;
     border-radius: 4px;
     font-family: var(--font-pixel);
-    font-size: 18px;
+    font-size: clamp(15px, 1.5vw, 18px);
     padding: 0 15px;
     cursor: pointer;
     text-transform: uppercase;
@@ -409,17 +414,20 @@ body:not(.arena-body)::before {
 .entrance-grid {
     display: grid;
     grid-template-columns: 1fr 340px;
+    align-items: stretch;
     padding: 0 !important;
 }
 
 .entrance-left {
     padding: 20px;
+    min-width: 0;
 }
 
 .entrance-right {
     display: flex;
     flex-direction: column;
     min-height: 100%;
+    min-width: 0;
     border-left: 2px solid #000;
     background: #fff;
 }
@@ -438,6 +446,7 @@ body:not(.arena-body)::before {
     flex: 1;
     min-height: 0;
     overflow-y: auto;
+    overscroll-behavior: contain;
 }
 
 .queue-count-badge {
@@ -514,6 +523,7 @@ body:not(.arena-body)::before {
     font-family: var(--font-pixel);
     font-size: 16px;
     box-shadow: 4px 4px 0px rgba(0,0,0,0.3), inset 2px 2px 0px rgba(255,255,255,0.5), inset -2px -2px 0px rgba(0,0,0,0.1);
+    gap: 10px;
 }
 
 .footer-copy {
@@ -668,18 +678,76 @@ input[type="text"]:focus {
     }
 }
 
+@media (max-width: 980px) {
+    .habbo-header {
+        padding: 10px 14px;
+    }
+
+    .habbo-content {
+        gap: 12px;
+    }
+
+    .entrance-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .entrance-right {
+        max-height: min(42vh, 360px);
+        border-left: 0;
+        border-top: 2px solid #000;
+    }
+
+    .queue-scroll-area {
+        max-height: none;
+    }
+}
+
 @media (max-width: 520px) {
     .habbo-header {
         align-items: flex-start;
         flex-direction: column;
         gap: 8px;
+        padding: 10px 12px;
     }
+
+    .habbo-box-header {
+        gap: 8px;
+        align-items: flex-start;
+        flex-wrap: wrap;
+    }
+
+    .status-bar {
+        flex-wrap: wrap;
+        gap: 6px;
+    }
+
     .lobby-info-grid {
         grid-template-columns: 1fr;
+        gap: 16px;
     }
+
     .input-group {
         flex-direction: column;
     }
+
+    .entrance-actions .habbo-btn,
+    .input-group .habbo-btn {
+        width: 100%;
+    }
+
+    .entrance-left {
+        padding: 14px;
+    }
+
+    .queue-inner-title {
+        padding: 10px 12px;
+    }
+
+    .footer-credit {
+        align-items: flex-start;
+        flex-wrap: wrap;
+    }
+
     .habbo-btn {
         min-height: 42px;
     }

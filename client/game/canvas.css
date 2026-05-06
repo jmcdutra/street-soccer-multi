@@ -4,7 +4,9 @@
 }
 
 .arena-body {
-    overflow: hidden;
+    min-height: 100svh;
+    overflow-x: hidden;
+    overflow-y: hidden;
     position: relative;
     background: #181818 url("/assets/bg.png") no-repeat center center !important;
     background-size: cover;
@@ -24,8 +26,9 @@
 }
 
 .arena-shell {
-    width: 100vw;
-    height: 100vh;
+    width: 100%;
+    min-height: 100svh;
+    height: 100svh;
     display: grid;
     grid-template-columns: minmax(0, 1fr) var(--sidebar-width);
     background: transparent;
@@ -34,14 +37,15 @@
 .arena-stage {
     position: relative;
     min-width: 0;
-    height: 100vh;
+    min-height: 100svh;
+    height: 100%;
 }
 
 #canvasDiv {
     position: relative;
     width: 100%;
-    height: 100vh;
-    min-height: 100vh;
+    height: 100%;
+    min-height: 100%;
     margin: 0;
     padding: 0;
     overflow: hidden;
@@ -216,6 +220,10 @@
     font-size: 13px;
     font-weight: 700;
     line-height: 1.35;
+}
+
+.spectator-badge[hidden] {
+    display: none !important;
 }
 
 .spectator-badge::before {
@@ -471,6 +479,12 @@
     gap: 6px;
 }
 
+.queue-list--stage {
+    max-height: 140px;
+    overflow-y: auto;
+    padding: 8px 10px 10px;
+}
+
 .mini-item,
 .queue-item,
 .admin-item {
@@ -603,6 +617,10 @@
 }
 
 @media (max-width: 980px) {
+    .arena-body {
+        overflow-y: auto;
+    }
+
     .arena-shell {
         height: auto;
         min-height: 100vh;
@@ -610,12 +628,13 @@
     }
 
     .arena-stage {
-        height: 68vh;
+        min-height: 0;
+        height: min(72svh, 700px);
     }
 
     #canvasDiv {
-        height: 68vh;
-        min-height: 68vh;
+        height: 100%;
+        min-height: 100%;
     }
 
     .arena-sidebar {
@@ -623,20 +642,67 @@
         overflow: visible;
         border-left: 0;
         border-top: 1px solid rgba(255, 255, 255, 0.1);
+        padding-top: 10px;
     }
 
     #tackle {
         display: grid;
     }
+
+    .queue-list--stage {
+        max-height: 180px;
+    }
+}
+
+@media (max-width: 760px) {
+    .arena-hud {
+        grid-template-columns: 1fr auto;
+        gap: 8px;
+        padding: 8px 10px;
+    }
+
+    .hud-brand {
+        grid-column: 1 / -1;
+    }
+
+    .hud-brand span {
+        font-size: 18px;
+    }
+
+    #info {
+        top: 124px;
+        right: 12px;
+        flex-direction: column;
+        align-items: flex-end;
+    }
+
+    .spectator-badge {
+        top: 124px;
+        left: 12px;
+        max-width: calc(100vw - 118px);
+    }
+
+    .arena-sidebar {
+        gap: 10px;
+        padding: 10px 10px 14px;
+    }
+
+    .team-grid {
+        grid-template-columns: 1fr;
+    }
 }
 
 @media (max-width: 620px) {
+    .arena-stage {
+        height: min(70svh, 620px);
+    }
+
     .arena-hud {
         grid-template-columns: 1fr;
-        flex-wrap: wrap;
         top: 8px;
         left: 8px;
         right: 8px;
+        gap: 6px;
     }
 
     .score-strip {
@@ -653,14 +719,20 @@
     }
 
     #info {
-        top: 116px;
+        top: 106px;
         right: 12px;
+        left: auto;
+        flex-direction: row;
+        justify-content: flex-end;
     }
 
     .spectator-badge {
-        top: 116px;
+        top: 150px;
         left: 12px;
         max-width: calc(100vw - 24px);
+        min-height: 0;
+        padding: 8px 12px;
+        font-size: 12px;
     }
 
     .help-modal {
@@ -680,5 +752,60 @@
 
     .help-key {
         width: fit-content;
+    }
+
+    .queue-list--stage {
+        max-height: 220px;
+    }
+}
+
+@media (max-width: 420px) {
+    .score-strip {
+        width: 100%;
+        grid-template-columns: 54px 38px 38px minmax(82px, 1fr);
+    }
+
+    .score-strip > * {
+        font-size: 16px;
+    }
+
+    .score-status,
+    #time-left {
+        font-size: 11px;
+    }
+
+    .navbar-btn-my,
+    #home,
+    #help-btn,
+    #leave-btn,
+    #mute-btn {
+        min-height: 32px;
+        min-width: 32px;
+    }
+
+    .navbar-btn-my img {
+        width: 20px;
+        height: 20px;
+    }
+
+    #info {
+        top: 102px;
+        gap: 6px;
+    }
+
+    .info-box {
+        min-width: 70px;
+        padding: 4px 8px !important;
+        font-size: 0.68rem !important;
+    }
+
+    .spectator-badge {
+        top: 144px;
+    }
+
+    #tackle {
+        right: 12px;
+        bottom: 12px;
+        width: min(150px, calc(100vw - 24px));
     }
 }
