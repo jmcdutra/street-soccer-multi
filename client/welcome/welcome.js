@@ -7,6 +7,7 @@ const queueCountEl = document.getElementById("queue-count");
 const queuePreviewEl = document.getElementById("queue-preview");
 const copyEl = document.getElementById("arena-copy");
 const loading = document.getElementById("loading");
+const spectateBtn = document.getElementById("spectate-btn");
 const HABBO_MISSING_KEY = "missingHabboHeads";
 const missingHabboHeads = new Set(loadMissingHabboHeads());
 let lastQueueSignature = null;
@@ -122,6 +123,12 @@ form.addEventListener("submit", (event) => {
     localStorage.setItem("name", name);
     showLoading();
     window.location.href = `/play?name=${encodeURIComponent(name)}`;
+});
+
+spectateBtn?.addEventListener("click", () => {
+    localStorage.removeItem("name");
+    showLoading();
+    window.location.href = "/play?spectator=1";
 });
 
 loadArena();

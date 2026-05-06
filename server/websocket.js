@@ -6,6 +6,12 @@ global.io = io;
 
 io.on("connection", (sock) => {
     const arena = global.arena;
+    sock.join("arena");
+    arena.emitState(sock);
+
+    sock.on("arena:sync", () => {
+        arena.emitState(sock);
+    });
 
     sock.on("player:join", async ({ name } = {}) => {
         try {

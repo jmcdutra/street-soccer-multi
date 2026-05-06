@@ -297,6 +297,28 @@ body:not(.arena-body)::before {
     margin-bottom: 0;
 }
 
+.entrance-actions {
+    display: grid;
+    gap: 6px;
+    margin-top: 10px;
+}
+
+.entrance-actions .habbo-btn {
+    width: fit-content;
+    min-height: 42px;
+    padding: 0 18px;
+    background: #e4e2df;
+    color: #000;
+    text-shadow: none;
+}
+
+.entrance-actions-copy {
+    color: #555;
+    font-family: var(--font-standard);
+    font-size: 12px;
+    line-height: 1.4;
+}
+
 /* Top Info Cards */
 .habbo-info-cards-top {
     display: grid;
@@ -397,6 +419,7 @@ body:not(.arena-body)::before {
 .entrance-right {
     display: flex;
     flex-direction: column;
+    min-height: 100%;
     border-left: 2px solid #000;
     background: #fff;
 }
@@ -413,8 +436,8 @@ body:not(.arena-body)::before {
 
 .queue-scroll-area {
     flex: 1;
+    min-height: 0;
     overflow-y: auto;
-    max-height: 250px;
 }
 
 .queue-count-badge {

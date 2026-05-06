@@ -7,6 +7,7 @@ let canvasDiv = document.getElementById('canvasDiv');
 let currentArenaState = null;
 let currentRole = 'spectator';
 let canControl = false;
+let arenaReady = false;
 const HABBO_MISSING_KEY = "missingHabboHeads";
 const missingHabboHeads = new Set(loadMissingHabboHeads());
 
@@ -40,6 +41,39 @@ function isTypingTarget(event) {
     return event.target?.isContentEditable || ["INPUT", "TEXTAREA", "SELECT"].includes(tagName);
 }
 
+function markArenaReady() {
+    if (arenaReady) return;
+    arenaReady = true;
+    document.getElementById('loading').style.display = 'none';
+    playBg();
+    if (typeof maybeOpenHelpModal === 'function') maybeOpenHelpModal();
+}
+
+function blurChatInput() {
+    const input = document.getElementById('chat-input');
+    if (document.activeElement === input) input.blur();
+}
+
+function releaseMovementKeys() {
+    if (!sock?.connected) return;
+    Object.keys(pressed).forEach((ecode) => {
+        sock.emit("input:key", { ecode, direction: 0 });
+    });
+    sock.emit('input:joystick', { dx: 0, dy: 0 });
+}
+
+function updateChatAvailability(state) {
+    const input = document.getElementById('chat-input');
+    const button = document.querySelector('#chat-form button');
+    const canChat = Boolean(state.me?.name);
+    input.disabled = !canChat;
+    button.disabled = !canChat;
+    input.placeholder = canChat
+        ? 'Falar no quarto...'
+        : 'Entre com nome para falar no chat.';
+    if (!canChat) input.value = '';
+}
+
 function openHelpModal() {
     const modal = document.getElementById('help-modal');
     if (!modal) return;
@@ -68,6 +102,11 @@ function setEventListener() {
     canvasDiv.addEventListener('mousedown', () => {
         if (canControl) sock.emit("input:shoot", getMouseTransformed());
     });
+
+    document.addEventListener('pointerdown', (event) => {
+        const chatForm = document.getElementById('chat-form');
+        if (!chatForm?.contains(event.target)) blurChatInput();
+    }, true);
 
     const tackleButton = document.querySelector('#tackle');
     tackleButton.addEventListener('click', sendTackle);
@@ -156,6 +195,23 @@ function setEventListener() {
         if (!text) return;
         sock.emit('chat:send', { text });
         input.value = '';
+        blurChatInput();
+    });
+
+    document.getElementById('chat-input').addEventListener('focus', () => {
+        releaseMovementKeys();
+    });
+
+    document.getElementById('chat-input').addEventListener('keydown', (event) => {
+        if (event.code === 'Escape') {
+            event.preventDefault();
+            blurChatInput();
+        }
+    });
+
+    window.addEventListener('blur', () => {
+        releaseMovementKeys();
+        blurChatInput();
     });
 
     document.querySelector('#left-area').style.display = 'none';
@@ -273,10 +329,43 @@ function arenaDisplayStatus(state) {
     return statusText(state.status);
 }
 
+function isNextToPlay(state) {
+    const myName = state.me?.name;
+    if (!myName || state.me?.role !== 'queued') return false;
+    return [...state.next.A, ...state.next.B].some((entry) => {
+        const name = typeof entry === 'string' ? entry : entry.name;
+        return name === myName;
+    });
+}
+
+function renderSpectatorBadge(state) {
+    const badge = document.getElementById('spectator-badge');
+    const text = document.getElementById('spectator-badge-text');
+    if (!badge || !text) return;
+
+    if (state.me?.role === 'player') {
+        badge.hidden = true;
+        badge.classList.remove('spectator-badge--next');
+        return;
+    }
+
+    const nextToPlay = isNextToPlay(state);
+    text.innerText = nextToPlay
+        ? 'Você é o próximo a jogar. Prepare-se!'
+        : 'Você está assistindo a partida.';
+    badge.hidden = false;
+    badge.classList.toggle('spectator-badge--next', nextToPlay);
+}
+
 function renderArenaState(state) {
+    const nextCanControl = state.me?.role === 'player' && ['PLAYING', 'GOLDEN_GOAL'].includes(state.status);
+    if (canControl && !nextCanControl) releaseMovementKeys();
+
     currentArenaState = state;
     currentRole = state.me?.role ?? 'spectator';
-    canControl = currentRole === 'player' && ['PLAYING', 'GOLDEN_GOAL'].includes(state.status);
+    canControl = nextCanControl;
+
+    if (state.me?.name || !window.INITIAL_PLAYER_NAME) markArenaReady();
 
     document.getElementById('arena-status').innerText = arenaDisplayStatus(state);
     document.getElementById('scoreboard-a').innerText = state.scoreA;
@@ -290,21 +379,17 @@ function renderArenaState(state) {
     renderMiniList('next-b', state.next.B, 'Aguardando');
     renderQueue(state.queue);
     renderChat(state.chat);
+    updateChatAvailability(state);
+    renderSpectatorBadge(state);
 
     const overlay = document.getElementById('lock-overlay');
     const title = document.getElementById('overlay-title');
     const copy = document.getElementById('overlay-copy');
-    const shouldShowOverlay = state.status === 'LOCKED' || currentRole !== 'player';
+    const shouldShowOverlay = state.status === 'LOCKED';
     overlay.style.display = shouldShowOverlay ? 'block' : 'none';
     if (state.status === 'LOCKED') {
         title.innerText = 'Arena bloqueada';
-        copy.innerText = 'Você está na fila. Aguarde os treinadores liberarem o jogo.';
-    } else if (currentRole === 'queued') {
-        title.innerText = 'Você está na fila';
-        copy.innerText = 'Assista enquanto espera sua vez na próxima rotação.';
-    } else if (currentRole === 'spectator') {
-        title.innerText = 'Modo espectador';
-        copy.innerText = 'Entre pela tela inicial para participar da fila.';
+        copy.innerText = 'A fila continua aberta, mas a partida só começa quando os treinadores liberarem a arena.';
     }
 }
 

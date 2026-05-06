@@ -34,7 +34,8 @@ const UserModelSchema = new mongoose.Schema({
     required: false
   },
   uniqueIps:{
-    type: [String]
+    type: [String],
+    default: []
   },
   usernames:{
     type: Array,
@@ -51,6 +52,8 @@ const UserModelSchema = new mongoose.Schema({
     }
   }
 });
+
+UserModelSchema.index({ uniqueIps: 1 });
 
 const PlayerProfileSchema = new mongoose.Schema({
   name: {

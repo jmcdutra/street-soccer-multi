@@ -15,7 +15,7 @@ let goalSound = document.querySelector('#goal-sound');
 let mute = localStorage.mute == '1' ? 1 : 0;
 let scoreBoardA = document.getElementById('scoreboard-a');
 let scoreBoardB = document.getElementById('scoreboard-b');
-let playerName = (window.INITIAL_PLAYER_NAME || new URLSearchParams(location.search).get('name') || localStorage.getItem('name') || '').trim();
+let playerName = (window.INITIAL_PLAYER_NAME || new URLSearchParams(location.search).get('name') || '').trim();
 let Cam = {
     shift: null,
     scale: 1,
@@ -47,12 +47,14 @@ const moveKeyMap = {
 };
 
 function onsock() {
+    sock.on('connect', () => {
+        sock.emit('arena:sync');
+    });
+
     sock.on('join:accepted', ({ name }) => {
         playerName = name;
         localStorage.setItem('name', name);
-        document.getElementById('loading').style.display = 'none';
-        playBg();
-        if (typeof maybeOpenHelpModal === 'function') maybeOpenHelpModal();
+        markArenaReady();
     });
 
     sock.on('join:error', (message) => {
@@ -135,11 +137,6 @@ function windowResized() {
 }
 
 function setup() {
-    if (!playerName) {
-        window.location.href = '/';
-        return;
-    }
-
     const stage = document.querySelector('.arena-stage');
     canvas = createCanvas(stage.clientWidth, stage.clientHeight);
     canvas.parent('canvasDiv');
@@ -155,7 +152,9 @@ function setup() {
     game = new Game('arena');
     setEventListener();
     onsock();
-    sock.emit('player:join', { name: playerName });
+    if (playerName) {
+        sock.emit('player:join', { name: playerName });
+    }
     changeTheme();
 }
 

@@ -24,6 +24,7 @@ module.exports.server = server;
 
 app.set('view engine','ejs');
 app.set('views', path.join(__dirname, 'views'));
+app.set('trust proxy', 1);
 
 // Cookies and User IDs
 app.use(cookieParser());
@@ -39,15 +40,20 @@ mongoose
 
 
 app.get("/", async function (req,res){ 
-    await logip(req,res);
+    logip(req,res).catch(err => console.log("Error logging visit", err));
     res.set('Cache-Control', 'no-store, max-age=0');
     // res.render('../client/welcome/welcome.ejs');
     res.sendFile("/client/welcome/welcome.html",{root:path.join(__dirname,"../")});
 })
 
 app.get("/play", async function (req,res){
-    await logip(req,res);
-    res.render(path.join(__dirname, '../client/game/game.ejs'),{playerName:req.query.name || ''});
+    const playerName = String(req.query.name ?? '').trim();
+    const isSpectator = req.query.spectator === '1';
+    if (!playerName && !isSpectator) {
+        return res.redirect('/');
+    }
+    logip(req,res).catch(err => console.log("Error logging visit", err));
+    res.render(path.join(__dirname, '../client/game/game.ejs'),{playerName});
 })
 
 app.get('/api/arena', async (req,res)=>{
@@ -164,7 +170,7 @@ app.post('/admin/api/:action', basicAdminAuth, async (req,res)=>{
     res.json({ok:true});
 });
 
-app.use("/",express.static("client"));
+app.use("/",express.static("client", { maxAge: '1d' }));
 
 
 app.use('/room',roomsRouter)

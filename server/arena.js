@@ -40,15 +40,18 @@ class Arena {
     this.matchEndsAt = null;
     this.intervalId = null;
     this.timeIntervalId = null;
+    this.countdownTimeoutId = null;
+    this.nextMatchTimeoutId = null;
     this.stateDirty = true;
     this.finishing = false;
+    this.queuePersistRevision = 0;
+    this.queuePersistPromise = Promise.resolve();
   }
 
   async init() {
     try {
-      const entries = await QueueEntryModel.find().sort({ position: 1, updatedAt: 1 }).lean();
-      this.queue = entries.map((entry) => entry.name);
-      await QueueEntryModel.updateMany({}, { online: false });
+      this.queue = [];
+      await QueueEntryModel.deleteMany({});
     } catch (err) {
       console.log("Arena queue restore failed:", err.message);
     }
@@ -71,6 +74,52 @@ class Arena {
     return global.io;
   }
 
+  clearScheduledTransitions() {
+    clearTimeout(this.countdownTimeoutId);
+    clearTimeout(this.nextMatchTimeoutId);
+    this.countdownTimeoutId = null;
+    this.nextMatchTimeoutId = null;
+    this.finishing = false;
+  }
+
+  persistQueue() {
+    const revision = ++this.queuePersistRevision;
+    const queueSnapshot = [...this.queue];
+    const onlineSnapshot = new Set(queueSnapshot.filter((name) => this.isOnline(name)));
+
+    this.queuePersistPromise = this.queuePersistPromise
+      .catch(() => {})
+      .then(async () => {
+        if (revision !== this.queuePersistRevision) return;
+
+        if (!queueSnapshot.length) {
+          await QueueEntryModel.deleteMany({});
+          return;
+        }
+
+        await QueueEntryModel.deleteMany({ name: { $nin: queueSnapshot } });
+        await QueueEntryModel.bulkWrite(
+          queueSnapshot.map((name, index) => ({
+            updateOne: {
+              filter: { name },
+              update: {
+                $set: {
+                  name,
+                  position: index + 1,
+                  online: onlineSnapshot.has(name),
+                  lastSeen: new Date()
+                }
+              },
+              upsert: true
+            }
+          }))
+        );
+      })
+      .catch((err) => {
+        console.log("Arena persistQueue failed:", err.message);
+      });
+  }
+
   async join(sock, rawName) {
     const name = this.cleanName(rawName);
     if (!name) {
@@ -87,15 +136,15 @@ class Arena {
     sock.join(ARENA_ROOM);
     sock.playerName = name;
     this.connections[name] = { sockId: sock.id, online: true, joinedAt: Date.now() };
-    await this.ensureProfile(name);
+    this.ensureProfile(name).catch((err) => {
+      console.log("Arena ensureProfile failed:", err.message);
+    });
     this.enqueue(name);
     this.persistQueue();
     sock.emit("join:accepted", { name });
 
     if (this.unlocked && this.status === STATUS.WAITING) {
       this.startNextMatch();
-    } else {
-      this.fillOpenSlots();
     }
     this.broadcastState();
   }
@@ -111,9 +160,7 @@ class Arena {
 
     const active = this.activeByName[name];
     if (active) {
-      const team = active.team;
       this.removeActivePlayer(name, true);
-      this.substitute(team);
     }
     this.broadcastState();
   }
@@ -122,15 +169,12 @@ class Arena {
     const name = sock.playerName;
     if (!name) return;
     const active = this.activeByName[name];
-    const team = active?.team;
 
     this.queue = this.queue.filter((entry) => entry !== name);
     if (active) this.removeActivePlayer(name, false);
     if (this.connections[name]?.sockId === sock.id) delete this.connections[name];
     sock.playerName = null;
     QueueEntryModel.deleteOne({ name }).catch(() => {});
-
-    if (team) this.substitute(team);
     this.persistQueue();
     this.broadcastState();
   }
@@ -221,8 +265,10 @@ class Arena {
   }
 
   startNextMatch() {
+    this.clearScheduledTransitions();
     if (!this.unlocked) {
       this.status = STATUS.LOCKED;
+      this.broadcastState();
       return;
     }
 
@@ -261,7 +307,7 @@ class Arena {
     this.status = STATUS.COUNTDOWN;
     this.broadcastState();
     this.io()?.in(ARENA_ROOM).emit("countDown", C.countDown);
-    setTimeout(() => {
+    this.countdownTimeoutId = setTimeout(() => {
       if (this.status !== STATUS.COUNTDOWN) return;
       this.status = STATUS.PLAYING;
       this.matchEndsAt = Date.now() + MATCH_SECONDS * 1000;
@@ -269,43 +315,27 @@ class Arena {
     }, C.countDown);
   }
 
-  substitute(team) {
-    if (![STATUS.PLAYING, STATUS.GOLDEN_GOAL, STATUS.COUNTDOWN].includes(this.status)) return;
-    if (this.activeCount(team) >= MAX_TEAM_SIZE) return;
-    const name = this.dequeueOnline();
-    if (!name) {
-      this.persistQueue();
-      return;
-    }
-    this.addActivePlayer(name, team);
-    this.persistQueue();
-  }
-
-  fillOpenSlots() {
-    if (![STATUS.PLAYING, STATUS.GOLDEN_GOAL, STATUS.COUNTDOWN].includes(this.status)) return;
-    while (Object.keys(this.activeByName).length < MAX_ACTIVE_PLAYERS) {
-      const team = this.getBalancedTeam(Object.keys(this.activeByName).length);
-      const before = Object.keys(this.activeByName).length;
-      this.substitute(team);
-      if (Object.keys(this.activeByName).length === before) break;
-    }
-  }
-
   unlock() {
+    this.clearScheduledTransitions();
     this.unlocked = true;
     if (this.status === STATUS.LOCKED) this.status = STATUS.WAITING;
     this.startNextMatch();
   }
 
   lock() {
+    this.clearScheduledTransitions();
     this.unlocked = false;
     for (const name of Object.keys(this.activeByName)) {
       this.removeActivePlayer(name, true);
     }
     this.players = {};
     this.activeByName = {};
+    this.ball.reset();
+    this.ballHolder = null;
+    this.lastShooterId = null;
     this.scoreA = 0;
     this.scoreB = 0;
+    this.matchEndsAt = null;
     this.status = STATUS.LOCKED;
     this.persistQueue();
     this.broadcastState();
@@ -314,6 +344,7 @@ class Arena {
   pause() {
     if ([STATUS.PLAYING, STATUS.GOLDEN_GOAL].includes(this.status)) {
       this.status = STATUS.BETWEEN_MATCH;
+      this.matchEndsAt = null;
       this.broadcastState();
     }
   }
@@ -328,31 +359,33 @@ class Arena {
 
   async finishMatch(winnerTeam) {
     if (this.finishing) return;
+    this.clearScheduledTransitions();
     this.finishing = true;
     const activeNames = Object.keys(this.activeByName);
     const winnerNames = activeNames.filter((name) => this.activeByName[name].team === winnerTeam);
     if (winnerTeam) {
-      await PlayerProfileModel.updateMany(
+      PlayerProfileModel.updateMany(
         { name: { $in: winnerNames } },
         { $inc: { points: 2, wins: 1, matches: 1 }, $set: { lastSeen: new Date() } }
-      );
+      ).catch((err) => console.log("Arena finishMatch winner update failed:", err.message));
       const loserNames = activeNames.filter((name) => this.activeByName[name].team !== winnerTeam);
       if (loserNames.length) {
-        await PlayerProfileModel.updateMany(
+        PlayerProfileModel.updateMany(
           { name: { $in: loserNames } },
           { $inc: { matches: 1 }, $set: { lastSeen: new Date() } }
-        );
+        ).catch((err) => console.log("Arena finishMatch loser update failed:", err.message));
       }
     } else if (activeNames.length) {
-      await PlayerProfileModel.updateMany(
+      PlayerProfileModel.updateMany(
         { name: { $in: activeNames } },
         { $inc: { matches: 1 }, $set: { lastSeen: new Date() } }
-      );
+      ).catch((err) => console.log("Arena finishMatch draw update failed:", err.message));
     }
 
     this.status = STATUS.BETWEEN_MATCH;
+    this.matchEndsAt = null;
     this.broadcastState();
-    setTimeout(() => {
+    this.nextMatchTimeoutId = setTimeout(() => {
       this.finishing = false;
       this.startNextMatch();
     }, 3500);
@@ -432,11 +465,11 @@ class Arena {
 
     const scorer = this.players[this.lastShooterId];
     if (scorer?.teamName === scoringTeam) {
-      await PlayerProfileModel.updateOne(
+      PlayerProfileModel.updateOne(
         { name: scorer.username },
         { $inc: { points: 5, goals: 1 }, $set: { lastSeen: new Date() } },
         { upsert: true }
-      );
+      ).catch((err) => console.log("Arena goal update failed:", err.message));
     }
 
     this.io()?.in(ARENA_ROOM).emit("score", { scoreA: this.scoreA, scoreB: this.scoreB });
@@ -450,9 +483,11 @@ class Arena {
     this.resetFormation(goalSide);
     this.broadcastState();
     this.io()?.in(ARENA_ROOM).emit("countDown", C.countDown);
-    setTimeout(() => {
+    clearTimeout(this.countdownTimeoutId);
+    this.countdownTimeoutId = setTimeout(() => {
       if (this.status === STATUS.COUNTDOWN) {
         this.status = STATUS.PLAYING;
+        this.matchEndsAt = Date.now() + MATCH_SECONDS * 1000;
         this.broadcastState();
       }
     }, C.countDown);
@@ -597,30 +632,23 @@ class Arena {
     );
   }
 
-  persistQueue() {
-    this.queue.forEach((name, index) => {
-      QueueEntryModel.updateOne(
-        { name },
-        {
-          $set: {
-            name,
-            position: index + 1,
-            online: this.isOnline(name),
-            lastSeen: new Date()
-          }
-        },
-        { upsert: true }
-      ).catch(() => {});
-    });
-  }
-
   async resetRanking() {
     await PlayerProfileModel.updateMany({}, { points: 0, goals: 0, wins: 0, matches: 0 });
   }
 
   clearQueue() {
+    this.clearScheduledTransitions();
     this.queue = [];
     QueueEntryModel.deleteMany({}).catch(() => {});
+    this.status = this.unlocked ? STATUS.WAITING : STATUS.LOCKED;
+    this.players = {};
+    this.activeByName = {};
+    this.ball.reset();
+    this.ballHolder = null;
+    this.lastShooterId = null;
+    this.scoreA = 0;
+    this.scoreB = 0;
+    this.matchEndsAt = null;
     this.broadcastState();
   }
 
@@ -635,23 +663,31 @@ class Arena {
     this.queue = this.queue.filter((entry) => entry !== cleaned);
     this.removeActivePlayer(cleaned, false);
     const connection = this.connections[cleaned];
-    if (connection?.sockId) this.io()?.sockets.sockets.get(connection.sockId)?.disconnect(true);
     delete this.connections[cleaned];
+    const sock = connection?.sockId ? this.io()?.sockets.sockets.get(connection.sockId) : null;
+    if (sock) {
+      sock.playerName = null;
+      sock.disconnect(true);
+    }
     QueueEntryModel.deleteOne({ name: cleaned }).catch(() => {});
+    this.persistQueue();
     this.broadcastState();
   }
 
   resetGame() {
+    this.clearScheduledTransitions();
     for (const name of Object.keys(this.activeByName)) this.removeActivePlayer(name, true);
     this.players = {};
     this.activeByName = {};
+    this.ball.reset();
+    this.ballHolder = null;
+    this.lastShooterId = null;
     this.scoreA = 0;
     this.scoreB = 0;
     this.matchEndsAt = null;
     this.status = this.unlocked ? STATUS.WAITING : STATUS.LOCKED;
     this.persistQueue();
-    if (this.unlocked) this.startNextMatch();
-    else this.broadcastState();
+    this.broadcastState();
   }
 
   chat(sock, text) {
