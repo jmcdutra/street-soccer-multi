@@ -33,7 +33,7 @@ class Player extends Entity{
     constructor(id,x,y,radius,isAdmin,username){
         super(x,y,radius);
         this.id = id;
-        this.strokeColor="rgba(255,255,255,0.6)";
+        this.strokeColor="rgba(255,43,63,0.86)";
         this.d = 2*radius;
         this.theta = 0;
         this.ballDir = 0;
@@ -92,13 +92,14 @@ class Player extends Entity{
     areaDisplay(){ // (called from index.js)
         fill("rgba(255,255,255,0)");
         stroke(this.strokeColor);
+        strokeWeight(2);
         ellipse(this.x,this.y,this.d,this.d); // circle representing player
        
-        stroke("#FFFFFF"); // white color to draw shapes
+        stroke("rgba(0,0,0,0.7)");
         textSize(15);
         textFont(openSans);
         fill("#FFF");
-        strokeWeight(1);
+        strokeWeight(3);
         textAlign(CENTER);
         text(this.username,this.x,this.y-2.5*this.radius);
         // this.theta=atan2((mouseY-this.y),(mouseX-this.x));
@@ -112,7 +113,8 @@ class Player extends Entity{
         let d1 = 45; // height of lower point of triangle
         let d2 = 55; // height of two upper points to make a downward pointing traingle
         let twidth = 10; // width of top base of triangle
-        fill('#088da5bb');
+        fill('#ff2b3fcc');
+        noStroke();
         triangle(this.x,this.y-d1,this.x-twidth,this.y-d2,this.x+twidth,this.y-d2); // needs 3 points (x,y)
         // ellipse(this.x+200*Math.cos(this.theta),this.y+200*sin(this.theta),5,5);
         // line(this.x,this.y,this.x+200*Math.cos(this.theta),this.y+200*sin(this.theta));
@@ -132,11 +134,11 @@ class Player extends Entity{
             if(this.zeroSent != 1){
                 // this only sends data once to set the velocity of player to 0.
                 this.zeroSent = 1;
-                sock.emit('joystick',{dx:0,dy:0});
+                sock.emit('input:joystick',{dx:0,dy:0});
             }
         } else{
             d = d/(Math.log1p(d/5)/Math.log1p(40/5));
-            sock.emit('joystick',{dx:dx/d,dy:dy/d});
+            sock.emit('input:joystick',{dx:dx/d,dy:dy/d});
             this.zeroSent = 0;
         }
     }
@@ -152,10 +154,10 @@ class Player extends Entity{
             if(this.zeroSent != 1){
                 // this only sends data once to set the velocity of player to 0.
                 this.zeroSent = 1;
-                // sock.emit('shoot',{x:0,y:0});
+                // sock.emit('input:shoot',{x:0,y:0});
             }
         } else{
-            sock.emit('shoot',{x:fac*dx/d+this.x,y:fac*dy/d+this.y});
+            sock.emit('input:shoot',{x:fac*dx/d+this.x,y:fac*dy/d+this.y});
             this.zeroSent = 0;
         }
     }

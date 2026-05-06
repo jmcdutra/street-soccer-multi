@@ -1,454 +1,196 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <link rel="manifest" href="/manifest.json">
-
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width,height=device-height initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Soccer</title>
-    <link rel="shortcut icon" href="/assets/favicon.ico">
-    <!-- CSS only -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
-    integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
-
-    <!-- <link rel="stylesheet" href="/libraries/bootstrap.min.css"> -->
+    <title>[TRE] Futzin dos Treinadores</title>
+    <link rel="icon" type="image/x-icon" href="/assets/favicon.ico">
+    <link rel="apple-touch-icon" href="/assets/favicon-192.png">
     <link rel="stylesheet" href="/style.css">
     <link rel="stylesheet" href="/game/counter.css">
     <link rel="stylesheet" href="/game/canvas.css">
     <link rel="stylesheet" href="/game/keyboard.css">
 </head>
-<body>
-    <!-- Loading -->
+<body class="arena-body">
+    <!-- SVG Crispify -->
+    <svg style="display: none; position: absolute; width: 0; height: 0;">
+        <filter id="crispify"><feComponentTransfer><feFuncA type="discrete" tableValues="0 1"/></feComponentTransfer></filter>
+    </svg>
+
     <div id="loading">
-        <svg id="svg-loader" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
-            style="margin: auto; background: rgba(241, 242, 243, 0); display: block;" width="204px" height="204px"
-            viewBox="0 0 100 100" preserveAspectRatio="xMidYMid">
-            <g transform="translate(50 50)">
-                <g transform="translate(-19 -19) scale(0.6)">
-                    <g>
-                        <animateTransform attributeName="transform" type="rotate" values="0;45" keyTimes="0;1"
-                            dur="0.2s" begin="0s" repeatCount="indefinite"></animateTransform>
-                        <path
-                            d="M31.924705322619776 20.610996823635016 L38.99577313448525 27.682064635500492 L27.682064635500492 38.99577313448525 L20.610996823635016 31.924705322619776 A38 38 0 0 1 8 37.14835124201342 L8 37.14835124201342 L8 47.14835124201342 L-7.999999999999995 47.14835124201342 L-7.999999999999996 37.14835124201342 A38 38 0 0 1 -20.610996823635006 31.92470532261978 L-20.610996823635006 31.92470532261978 L-27.68206463550048 38.995773134485255 L-38.99577313448525 27.68206463550049 L-31.924705322619776 20.610996823635013 A38 38 0 0 1 -37.14835124201342 8.00000000000001 L-37.14835124201342 8.00000000000001 L-47.14835124201342 8.000000000000012 L-47.14835124201342 -8 L-37.14835124201342 -8.000000000000002 A38 38 0 0 1 -31.924705322619783 -20.610996823635006 L-31.924705322619783 -20.610996823635006 L-38.99577313448526 -27.682064635500478 L-27.68206463550051 -38.99577313448523 L-20.61099682363503 -31.924705322619765 A38 38 0 0 1 -7.9999999999999964 -37.14835124201342 L-7.9999999999999964 -37.14835124201342 L-7.999999999999998 -47.14835124201342 L7.9999999999999805 -47.14835124201342 L7.999999999999982 -37.14835124201342 A38 38 0 0 1 20.610996823635016 -31.924705322619776 L20.610996823635016 -31.924705322619776 L27.68206463550049 -38.995773134485255 L38.99577313448524 -27.68206463550051 L31.924705322619765 -20.61099682363503 A38 38 0 0 1 37.14835124201342 -7.999999999999998 L37.14835124201342 -7.999999999999998 L47.14835124201342 -8 L47.148351242013426 7.999999999999978 L37.148351242013426 7.9999999999999805 A38 38 0 0 1 31.924705322619776 20.610996823635013 M0 -23A23 23 0 1 0 0 23 A23 23 0 1 0 0 -23"
-                            fill="#f13030"></path>
-                    </g>
-                </g>
-                <g transform="translate(19 19) scale(0.6)">
-                    <g>
-                        <animateTransform attributeName="transform" type="rotate" values="45;0" keyTimes="0;1"
-                            dur="0.2s" begin="-0.1s" repeatCount="indefinite"></animateTransform>
-                        <path
-                            d="M-31.924705322619783 -20.610996823635006 L-38.99577313448526 -27.682064635500478 L-27.68206463550051 -38.99577313448523 L-20.61099682363503 -31.924705322619765 A38 38 0 0 1 -7.9999999999999964 -37.14835124201342 L-7.9999999999999964 -37.14835124201342 L-7.999999999999998 -47.14835124201342 L7.9999999999999805 -47.14835124201342 L7.999999999999982 -37.14835124201342 A38 38 0 0 1 20.610996823635016 -31.924705322619776 L20.610996823635016 -31.924705322619776 L27.68206463550049 -38.995773134485255 L38.99577313448524 -27.68206463550051 L31.924705322619765 -20.61099682363503 A38 38 0 0 1 37.14835124201342 -7.999999999999998 L37.14835124201342 -7.999999999999998 L47.14835124201342 -8 L47.148351242013426 7.999999999999978 L37.148351242013426 7.9999999999999805 A38 38 0 0 1 31.924705322619776 20.610996823635013 L31.924705322619776 20.610996823635013 L38.995773134485255 27.68206463550049 L27.682064635500513 38.99577313448523 L20.610996823635034 31.92470532261976 A38 38 0 0 1 8 37.14835124201342 L8 37.14835124201342 L8.000000000000004 47.14835124201342 L-7.999999999999976 47.148351242013426 L-7.999999999999979 37.148351242013426 A38 38 0 0 1 -20.610996823634984 31.924705322619797 L-20.610996823634984 31.924705322619797 L-27.68206463550045 38.99577313448528 L-38.99577313448521 27.682064635500545 L-31.924705322619744 20.610996823635062 A38 38 0 0 1 -37.14835124201342 8.000000000000004 L-37.14835124201342 8.000000000000004 L-47.14835124201342 8.000000000000007 L-47.148351242013426 -7.999999999999972 L-37.148351242013426 -7.999999999999975 A38 38 0 0 1 -31.924705322619758 -20.610996823635038 M0 -23A23 23 0 1 0 0 23 A23 23 0 1 0 0 -23"
-                            fill="#0ffd06"></path>
-                    </g>
-                </g>
-            </g>
-        </svg>
-    </div> 
-    <!-- Team Modal -->
-    <div class="modal fade" id="teamModal" tabindex="-1" aria-labelledby="teamModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-        <div class="modal-header">
-            <h5 class="modal-title" id="teamModalLabel">Team</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-            <div class="row d-flex justify-content-around">
-                <div class="col-3 border border-primary">
-                    <table id="blue-team" class="table table-sm">
-                    <thead>Blue team</thead>
-                    <tbody>
-                        
-                    </tbody></table>
-                </div>
-                <div class="col-2 border border-primary d-flex align-items-center justify-content-around">
-                    <button id="change-team" class="btn btn-primary">switch</button>
-                </div>
-                
-                <div class="col-3 border border-primary">
-                    <table id="red-team" class="table table-sm">
-                    <thead>Red team</thead>
-                    <tbody>
-                        
-                    </tbody></table>
-                </div>
-            </div>
-        </div>
-        <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-        </div>
+        <div class="habbo-loader">
+            <img src="/assets/ball-dark-light.png" class="spin-ball" alt="Bola">
+            <p>CARREGANDO ARENA...</p>
         </div>
     </div>
-    </div>
-    <!-- Invite Modal -->
-    <div class="modal fade" id="inviteModal" tabindex="-1" aria-labelledby="inviteModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-        <div class="modal-header">
-            <h5 class="modal-title" id="inviteModalLabel">Team</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body" >
-            Copy the link to invite your friends to play Real Soccer in Room : 
-            <!-- <input type="text" value=<% roomName %> readonly> -->
-            <span id="invite-modal-text-area"></span>
-            <button class="btn py-0 px-1" onclick="copyUrl()" id="clipboard-btn">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-clipboard" viewBox="0 0 16 16">
-                    <path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/>
-                    <path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/>
-                </svg>
-            </button>
-        </div>
-        <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-        </div>
-        </div>
-    </div>
-    </div>
-    <!-- About Us Modal -->
-    <div class="modal fade" id="aboutUsModal" tabindex="-1" aria-labelledby="aboutUsModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-lg">
-        <div class="modal-content">
-        <div class="modal-header">
-            <h5 class="modal-title" id="aboutUsModalLabel">About Us</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body" >
-            <div class="container container-fluid">
-                <div class="row">
-                    Source Code
-                        <img alt="svgImg" style="max-width: 30px; padding: 0px 2px; cursor: pointer;" onclick="document.location.href='https://github.com/bhuvan-byte/street-soccer-multi'" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHg9IjBweCIgeT0iMHB4Igp3aWR0aD0iNjQiIGhlaWdodD0iNjQiCnZpZXdCb3g9IjAgMCA2NCA2NCIKc3R5bGU9IiBmaWxsOiMwMDAwMDA7Ij48bGluZWFyR3JhZGllbnQgaWQ9IktwekhfdHRUTUlqcThkaHgxekQycGFfNTI1MzlfZ3IxIiB4MT0iMzAuOTk5IiB4Mj0iMzAuOTk5IiB5MT0iMTYiIHkyPSI1NS4zNDIiIGdyYWRpZW50VW5pdHM9InVzZXJTcGFjZU9uVXNlIiBzcHJlYWRNZXRob2Q9InJlZmxlY3QiPjxzdG9wIG9mZnNldD0iMCIgc3RvcC1jb2xvcj0iIzZkYzdmZiI+PC9zdG9wPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iI2U2YWJmZiI+PC9zdG9wPjwvbGluZWFyR3JhZGllbnQ+PHBhdGggZmlsbD0idXJsKCNLcHpIX3R0VE1JanE4ZGh4MXpEMnBhXzUyNTM5X2dyMSkiIGQ9Ik0yNS4wMDgsNTYuMDA3Yy0wLjAwMy0wLjM2OC0wLjAwNi0xLjk2Mi0wLjAwOS0zLjQ1NGwtMC4wMDMtMS41NSBjLTYuNzI5LDAuOTE1LTguMzU4LTMuNzgtOC4zNzYtMy44M2MtMC45MzQtMi4zNjgtMi4yMTEtMy4wNDUtMi4yNjYtMy4wNzNsLTAuMTI0LTAuMDcyYy0wLjQ2My0wLjMxNi0xLjY5MS0xLjE1Ny0xLjM0Mi0yLjI2MyBjMC4zMTUtMC45OTcsMS41MzYtMS4xLDIuMDkxLTEuMDgyYzMuMDc0LDAuMjE1LDQuNjMsMi45NzgsNC42OTQsMy4wOTVjMS41NjksMi42ODksMy45NjQsMi40MTEsNS41MDksMS44NDQgYzAuMTQ0LTAuNjg4LDAuMzY3LTEuMzIsMC42NTktMS44NzhDMjAuODg1LDQyLjg2NSwxNS4yNyw0MC4yMjksMTUuMjcsMzAuNjRjMC0yLjYzMywwLjgyLTQuOTYsMi40NDEtNi45MjkgYy0wLjM2Mi0xLjIwNi0wLjc3NC0zLjY2NiwwLjQ0Ni02Ljc2NWwwLjE3NC0wLjQ0MmwwLjQ1Mi0wLjE0NGMwLjQxNi0wLjEzNywyLjY4OC0wLjYyNCw3LjM1OSwyLjQzMyBjMS45MjgtMC40OTQsMy45NjktMC43NDksNi4wNzQtMC43NTljMi4xMTUsMC4wMSw0LjE1OCwwLjI2NSw2LjA5LDAuNzU5YzQuNjY3LTMuMDU4LDYuOTM0LTIuNTY1LDcuMzUxLTIuNDMzbDAuNDUxLDAuMTQ1IGwwLjE3NCwwLjQ0YzEuMjI1LDMuMDk4LDAuODEzLDUuNTU5LDAuNDUxLDYuNzY2YzEuNjE4LDEuOTYzLDIuNDM4LDQuMjkxLDIuNDM4LDYuOTI5YzAsOS41OTEtNS42MjEsMTIuMjE5LTEwLjU4OCwxMy4wODcgYzAuNTYzLDEuMDY1LDAuODY4LDIuNDAyLDAuODY4LDMuODc4YzAsMS42ODMtMC4wMDcsNy4yMDQtMC4wMTUsOC40MDJsLTItMC4wMTRjMC4wMDgtMS4xOTYsMC4wMTUtNi43MDgsMC4wMTUtOC4zODkgYzAtMi40NDItMC45NDMtMy41MjItMS4zNS0zLjg3NGwtMS43My0xLjQ5N2wyLjI3NC0wLjI1M2M1LjIwNS0wLjU3OCwxMC41MjUtMi4zNzksMTAuNTI1LTExLjM0MWMwLTIuMzMtMC43NzctNC4zNjEtMi4zMS02LjAzNiBsLTAuNDMtMC40NjlsMC4yNDItMC41ODdjMC4xNjYtMC40MDEsMC44OTQtMi40NDItMC4wNDMtNS4yOTFjLTAuNzU4LDAuMDQ1LTIuNTY4LDAuNDAyLTUuNTg0LDIuNDQ3bC0wLjM4NCwwLjI1OWwtMC40NDUtMC4xMjMgYy0xLjg2My0wLjUxOC0zLjkzOC0wLjc5Ni02LjAwMS0wLjgwNmMtMi4wNTIsMC4wMS00LjEyNCwwLjI4OC01Ljk4NCwwLjgwNmwtMC40NDUsMC4xMjNsLTAuMzgzLTAuMjU5IGMtMy4wMTktMi4wNDQtNC44MzMtMi40MDQtNS41OTQtMi40NDljLTAuOTM1LDIuODUxLTAuMjA2LDQuODkyLTAuMDQsNS4yOTNsMC4yNDIsMC41ODdsLTAuNDI5LDAuNDY5IGMtMS41MzYsMS42ODEtMi4zMTQsMy43MTItMi4zMTQsNi4wMzZjMCw4Ljk1OCw1LjMxLDEwLjc3LDEwLjUwNCwxMS4zNjFsMi4yNTIsMC4yNTZsLTEuNzA4LDEuNDkgYy0wLjM3MiwwLjMyNS0xLjAzLDEuMTEyLTEuMjU0LDIuNzI3bC0wLjA3NSwwLjU0OWwtMC41MDYsMC4yMjdjLTEuMzIxLDAuNTkyLTUuODM5LDIuMTYyLTguNTQ4LTIuNDg1IGMtMC4wMTUtMC4wMjUtMC41NDQtMC45NDUtMS41MDItMS41NTdjMC42NDYsMC42MzksMS40MzMsMS42NzMsMi4wNjgsMy4yODdjMC4wNjYsMC4xOSwxLjM1NywzLjYyMiw3LjI4LDIuMzM5bDEuMjA2LTAuMjYyIGwwLjAxMiwzLjk3OGMwLjAwMywxLjQ4NywwLjAwNiwzLjA3NiwwLjAwOSwzLjQ0NEwyNS4wMDgsNTYuMDA3eiI+PC9wYXRoPjxsaW5lYXJHcmFkaWVudCBpZD0iS3B6SF90dFRNSWpxOGRoeDF6RDJwYl81MjUzOV9ncjIiIHgxPSIzMiIgeDI9IjMyIiB5MT0iNSIgeTI9IjU5LjE2NyIgZ3JhZGllbnRVbml0cz0idXNlclNwYWNlT25Vc2UiIHNwcmVhZE1ldGhvZD0icmVmbGVjdCI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjMWE2ZGZmIj48L3N0b3A+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjYzgyMmZmIj48L3N0b3A+PC9saW5lYXJHcmFkaWVudD48cGF0aCBmaWxsPSJ1cmwoI0twekhfdHRUTUlqcThkaHgxekQycGJfNTI1MzlfZ3IyKSIgZD0iTTMyLDU4QzE3LjY2Myw1OCw2LDQ2LjMzNyw2LDMyUzE3LjY2Myw2LDMyLDZzMjYsMTEuNjYzLDI2LDI2UzQ2LjMzNyw1OCwzMiw1OHogTTMyLDggQzE4Ljc2Nyw4LDgsMTguNzY3LDgsMzJzMTAuNzY3LDI0LDI0LDI0czI0LTEwLjc2NywyNC0yNFM0NS4yMzMsOCwzMiw4eiI+PC9wYXRoPjwvc3ZnPg=="/>
-                </div>
-                <div class="row">
-                    Created & Maintained By                    
-                        Bhuvan <img alt="svgImg" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHg9IjBweCIgeT0iMHB4Igp3aWR0aD0iNDgiIGhlaWdodD0iNDgiCnZpZXdCb3g9IjAgMCA0OCA0OCIKc3R5bGU9IiBmaWxsOiMwMDAwMDA7Ij48cGF0aCBmaWxsPSIjMDI4OEQxIiBkPSJNNDIsMzdjMCwyLjc2Mi0yLjIzOCw1LTUsNUgxMWMtMi43NjEsMC01LTIuMjM4LTUtNVYxMWMwLTIuNzYyLDIuMjM5LTUsNS01aDI2YzIuNzYyLDAsNSwyLjIzOCw1LDVWMzd6Ij48L3BhdGg+PHBhdGggZmlsbD0iI0ZGRiIgZD0iTTEyIDE5SDE3VjM2SDEyek0xNC40ODUgMTdoLS4wMjhDMTIuOTY1IDE3IDEyIDE1Ljg4OCAxMiAxNC40OTkgMTIgMTMuMDggMTIuOTk1IDEyIDE0LjUxNCAxMmMxLjUyMSAwIDIuNDU4IDEuMDggMi40ODYgMi40OTlDMTcgMTUuODg3IDE2LjAzNSAxNyAxNC40ODUgMTd6TTM2IDM2aC01di05LjA5OWMwLTIuMTk4LTEuMjI1LTMuNjk4LTMuMTkyLTMuNjk4LTEuNTAxIDAtMi4zMTMgMS4wMTItMi43MDcgMS45OUMyNC45NTcgMjUuNTQzIDI1IDI2LjUxMSAyNSAyN3Y5aC01VjE5aDV2Mi42MTZDMjUuNzIxIDIwLjUgMjYuODUgMTkgMjkuNzM4IDE5YzMuNTc4IDAgNi4yNjEgMi4yNSA2LjI2MSA3LjI3NEwzNiAzNiAzNiAzNnoiPjwvcGF0aD48L3N2Zz4=" style="max-width: 30px; padding: 0px 4px; cursor: pointer;" onclick="document.location.href='https://www.linkedin.com/in/bhuvan1'"/>
-                        &  Raahil <img alt="svgImg" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHg9IjBweCIgeT0iMHB4Igp3aWR0aD0iNDgiIGhlaWdodD0iNDgiCnZpZXdCb3g9IjAgMCA0OCA0OCIKc3R5bGU9IiBmaWxsOiMwMDAwMDA7Ij48cGF0aCBmaWxsPSIjMDI4OEQxIiBkPSJNNDIsMzdjMCwyLjc2Mi0yLjIzOCw1LTUsNUgxMWMtMi43NjEsMC01LTIuMjM4LTUtNVYxMWMwLTIuNzYyLDIuMjM5LTUsNS01aDI2YzIuNzYyLDAsNSwyLjIzOCw1LDVWMzd6Ij48L3BhdGg+PHBhdGggZmlsbD0iI0ZGRiIgZD0iTTEyIDE5SDE3VjM2SDEyek0xNC40ODUgMTdoLS4wMjhDMTIuOTY1IDE3IDEyIDE1Ljg4OCAxMiAxNC40OTkgMTIgMTMuMDggMTIuOTk1IDEyIDE0LjUxNCAxMmMxLjUyMSAwIDIuNDU4IDEuMDggMi40ODYgMi40OTlDMTcgMTUuODg3IDE2LjAzNSAxNyAxNC40ODUgMTd6TTM2IDM2aC01di05LjA5OWMwLTIuMTk4LTEuMjI1LTMuNjk4LTMuMTkyLTMuNjk4LTEuNTAxIDAtMi4zMTMgMS4wMTItMi43MDcgMS45OUMyNC45NTcgMjUuNTQzIDI1IDI2LjUxMSAyNSAyN3Y5aC01VjE5aDV2Mi42MTZDMjUuNzIxIDIwLjUgMjYuODUgMTkgMjkuNzM4IDE5YzMuNTc4IDAgNi4yNjEgMi4yNSA2LjI2MSA3LjI3NEwzNiAzNiAzNiAzNnoiPjwvcGF0aD48L3N2Zz4=" style="max-width: 30px; padding: 0px 4px; cursor: pointer;" onclick="document.location.href='https://www.linkedin.com/in/raahilbadiani'"/>
-                </div>
-            </div>
-        </div>
-        </div>
-    </div>
-    </div>
-    <!-- Controls Modal -->
-    <div class="modal fade" id="controlsModal" tabindex="-1" aria-labelledby="controlsModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-centered">
-        <div class="modal-content">
-        <div class="modal-header">
-            <h5 class="modal-title" id="controlsModalLabel">Controls</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-            <div class="container-fluid">
-                <div class="row d-flex justify-content-evenly">
-                    <div class="col col-3">
-                        <div class="keyboard">
-                        <div class="row my-1">
-                            <div class="keyboard__row">
-                                <div class="key--letter" data-char="W">W</div>
-                            </div>
-                        </div>
-                        <div class="row my-1">
-                            <div class="keyboard__row">
-                                <div class="key--letter" data-char="A">A</div>
-                                <div class="key--letter" data-char="S">S</div>
-                                <div class="key--letter" data-char="D">D</div>
-                            </div>
-                        </div>
-                        </div>
-                        <div class="row d-flex justify-content-center align-items-center">
-                            Move
-                        </div>
-                    </div>
-                    <div class="col col-3">
-                        <div class="keyboard">
-                        <div class="row my-1">
-                            <div class="keyboard__row">
-                                <div class="key--letter" data-key="37"><span>&#9650;</span></div>
-                            </div>
-                        </div>
-                        <div class="row my-1">
-                            <div class="keyboard__row">
-                                <div class="key--letter" data-key="37"><span>&#9664;</span></div>
-                                <div class="key--letter" data-key="37"><span>&#9660;</span></div>
-                                <div class="key--letter" data-key="37"><span>&#9654;</span></div>
-                            </div>
-                        </div>
-                        </div>
-                        <div class="row d-flex justify-content-center align-items-center">
-                            Move
-                        </div>
-                    </div>
-                    <div class="col col-3">
-                        <div class="row d-flex justify-content-center align-items-center">
-                            <img src="../assets/mouse1.png" style="width: 64px; height: 64px; background-color: white;">
-                        </div>
-                        <div class="row d-flex justify-content-center align-items-center">
-                            Shoot
-                        </div>
-                    </div>
-                </div>
-                <div class="row d-flex justify-content-center align-items-center">
-                    <div class="col col-3">
-                        <div class="keyboard">
-                            <div class="row my-1">
-                                <div class="keyboard__row">
-                                    <div class="key--double key--right key--space" data-key="32" data-char=" ">Space</div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row d-flex justify-content-center align-items-center">
-                            Tackle
-                        </div>
-                    </div>
-                </div>
-                <div class="row d-flex justify-content-evenly">
-                    <div class="col col-3">
-                        <div class="row d-flex justify-content-center align-items-center">
-                            <div class="row d-flex justify-content-center align-items-center px-4 m-0" style="height: 64px; width: 50px; ">
-                                <div style="border-radius: 50%; background-color: rgba(56, 56, 230, 0.685); width:64px; height: 64px; display: flex; justify-content: center; align-items: center;">
-                                    <div style="border-radius: 50%; background-color: rgb(5, 34, 112); width:32px; height: 32px; cursor: pointer;">
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row d-flex justify-content-center align-items-center">
-                            Move
-                        </div>
-                        <div class="row d-flex justify-content-center align-items-center">
-                            (Left half screen)
-                        </div>
-                    </div>
-                    <div class="col col-3" >
-                        <div class="row d-flex justify-content-center align-items-center">
-                            <div class="row d-flex justify-content-center align-items-center px-4 m-0" style="height: 64px; width: 50px; display: block; ">
-                                <div style="border-radius: 50%; background-color: rgba(192, 51, 51, 0.685); width:64px; height: 64px; display: flex; justify-content: center; align-items: center;">                                        
-                                    <div style="border-radius: 50%; background-color: rgb(233, 20, 20); width:32px; height: 32px; cursor: pointer;">
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row d-flex justify-content-center align-items-center">
-                            Shoot
-                        </div>
-                        <div class="row d-flex justify-content-center align-items-center">
-                            (Right half screen)
-                        </div>
-                    </div>
-                    <div class="col col-3">
-                        <div class="row d-flex justify-content-center">
-                            <div class="btn btn-primary d-flex align-items-center justify-content-center" style="border-radius: 50%; width: 50px; height: 50px;">T</div>
-                        </div>
-                        <div class="row d-flex justify-content-center">Tackle</div>
-                    </div>
-                </div>
-            </div>
-        </div>
 
-        <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-        </div>
-        </div>
-    </div>
-    </div>
-    <!-- Settings Modal -->
-    <div class="modal fade" id="settingsModal" tabindex="-1" aria-labelledby="settingsModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-        <div class="modal-header">
-            <h5 class="modal-title" id="settingsModalLabel">Settings</h5>
-            <button type="button" class="btn-close game-time-close-btn" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body" >
-            <div class="container-fluid">
-                <div class="row">
-                    <div class="col col-3"><label for="kick-vol-slider">Kick Sound</label></div>
-                    <div class="col col-3"><input type="range" min="0" max="1" value="0.5" step="0.1" class="slider" id="kick-vol-slider"></div>
+    <main class="arena-shell">
+        <section class="arena-stage">
+            <nav id="navbar" class="arena-hud">
+                <div class="hud-brand">
+                    <img src="/assets/Logo_Game.png" alt="Logo" class="pixel-icon hud-logo">
+                    <span>FUTZIN DOS TREINADORES</span>
                 </div>
-                <div class="row">
-                    <div class="col col-3"><label for="goal-vol-slider">Goal Sound</label></div>
-                    <div class="col col-3"><input type="range" min="0" max="0.3" value="0.10" step="0.01" class="slider" id="goal-vol-slider"></div>
-                </div>
-                <div class="row">
-                    <div class="col col-3"><label for="bg-vol-slider">BGM</label></div>
-                    <div class="col col-3">
-                        <input type="range" min="0" max="1" value="0.08" step="0.01" class="slider" id="bg-vol-slider">
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col col-3"><label for="bg-vol-slider">Game Time(min)</label></div>
-                    <div class="col col-3">
-                        <input type="range" min="1" max="10" value="2" step="1" class="slider" id="game-time" list="tickmarks">
-                        <datalist id="tickmarks">
-                            <option value="1"></option><option value="2"></option><option value="3"></option><option value="4"></option><option value="5"></option><option value="6"></option><option value="7"></option><option value="8"></option><option value="9"></option><option value="10"></option>
-                        </datalist>
-                    
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col col-3"> <label for="theme-slider">Theme</label> </div>
-                    <div class="col col-2">
-                        <select name="theme" id="theme-slider" class="form-select">
-                                <option value="0">Light</option>
-                                <option value="1">Dark</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="modal-footer">
-            <button type="button" class="btn btn-secondary game-time-close-btn" data-bs-dismiss="modal">Close</button>
-        </div>
-        </div>
-    </div>
-    </div>
-    <!-- Game Over Modal -->
-    <div class="modal fade" id="gameOverModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="gameOverModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content" id="final-score-board">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="gameOverModalLabel">Game Over</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="container container-fluid">
-                        <div class="row d-flex align-items-center justify-content-evenly"> <h1>SCORES</h1></div>
-                        <div class="row d-flex justify-content-evenly align-items-center">
-                            <div class="col d-flex justify-content-center"> <h1>Blue</h1> </div>
-                            <div class="col d-flex justify-content-center"> <h1>Red</h1> </div>
-                        </div>
-                        <div class="row d-flex justify-content-evenly align-items-center">
-                            <div class="col d-flex justify-content-center final-score" id="final-score-a"></div>
-                            <div class="col d-flex justify-content-center final-score" id="final-score-b"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <!-- Button gameover modal -->
-    <button id="gameOver" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#gameOverModal" style="display: none;">Game Over</button>
-    <!-- Dynamic Name Modal -->
-    <div class="modal fade" id="dynamicNameBtnModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="dynamicNameBtnModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="dynamicNameBtnModalLabel">Enter Name</h5>
-                </div>
-                <div class="modal-body">
-                    <div class="row">
-                    <div class="col col-2 d-flex justify-content-center mx-1 px-0"><label for="name-input">Name</label></div>
-                    <div class="col col-3 d-flex justify-content-center mx-1 px-0"><input type="text" id="name-input" style="max-width: 125px;"></div>
-                    <!-- <div class="col col-2 d-flex justify-content-center mx-1 px-0"><button class="btn btn-primary btn-sm" id="save-name-btn">Save</button></div> -->
-                </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" onclick="playBg();setName()">Close</button>
-                </div>
-            </div>
-        </div>
-    </div>
-    <!-- Dynamic Name modal button -->
-    <button id="dynamicNameBtn" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#dynamicNameBtnModal" style="display: none;">
-    Name
-    </button>
-    
-    <!-- New navbar -->
-    <div  id="navbar" class="row" style="position: absolute; top: 0px; left: 0px; right:0px; z-index: 5;">
-        <div class="col border d-flex">
-            <button class="btn btn-sm btn-primary navbar-btn-my mx-1 py-0" id="home">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-house-door" viewBox="0 0 16 16">
-                    <path d="M8.354 1.146a.5.5 0 0 0-.708 0l-6 6A.5.5 0 0 0 1.5 7.5v7a.5.5 0 0 0 .5.5h4.5a.5.5 0 0 0 .5-.5v-4h2v4a.5.5 0 0 0 .5.5H14a.5.5 0 0 0 .5-.5v-7a.5.5 0 0 0-.146-.354L13 5.793V2.5a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5v1.293L8.354 1.146zM2.5 14V7.707l5.5-5.5 5.5 5.5V14H10v-4a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5v4H2.5z"/>
-                </svg>
-            </button> 
 
-            
-            <div class="btn-group py-0 my-0" role="group" style="vertical-align: top;">
-                <button id="time-left" class="btn btn-secondary btn-sm py-0 px-3" style="pointer-events: none;">00:00</button>
-                <button id="scoreboard-a" class="btn btn-sm btn-primary py-0 px-4" style="pointer-events: none;">0</button>
-                <button id="scoreboard-b" class="btn btn-sm btn-danger py-0 px-4" style="pointer-events: none;">0</button>
-            </div>    
-        </div>
-        <div class="col border d-flex justify-content-begin justify-content-md-evenly"> 
-            <button id="start" class="btn btn-sm btn-primary navbar-btn-my mx-1 py-0">Start</button>
-        </div>
-        <div class="col border d-flex justify-content-center justify-content-md-end "> 
-            <button id="invite" class="btn btn-sm btn-primary navbar-btn-my mx-1 py-0" data-modal-target="#my-modal"
-            type="button" data-bs-toggle="modal" data-bs-target="#inviteModal">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-person-plus" viewBox="0 0 16 16">
-                    <path d="M6 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0zm4 8c0 1-1 1-1 1H1s-1 0-1-1 1-4 6-4 6 3 6 4zm-1-.004c-.001-.246-.154-.986-.832-1.664C9.516 10.68 8.289 10 6 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664h10z"/>
-                    <path fill-rule="evenodd" d="M13.5 5a.5.5 0 0 1 .5.5V7h1.5a.5.5 0 0 1 0 1H14v1.5a.5.5 0 0 1-1 0V8h-1.5a.5.5 0 0 1 0-1H13V5.5a.5.5 0 0 1 .5-.5z"/>
-                </svg>
+                <div class="hud-score">
+                    <div class="score-strip" aria-label="Placar">
+                        <span id="time-left">3:00</span>
+                        <strong id="scoreboard-a" class="score-blue">0</strong>
+                        <strong id="scoreboard-b" class="score-red">0</strong>
+                        <span id="arena-status" class="score-status">Bloqueado</span>
+                    </div>
+                </div>
+
+                <div class="hud-actions">
+                    <button id="home" class="habbo-btn navbar-btn-my" title="Lobby Principal"><img src="/assets/home.png" alt="Home" class="pixel-icon"></button>
+                    <button id="help-btn" class="habbo-btn navbar-btn-my" type="button" title="Ajuda"><img src="/assets/ajuda.gif" alt="Ajuda" class="pixel-icon"></button>
+                    <button id="mute-btn" class="habbo-btn navbar-btn-my" title="Som"><img id="mute-icon" src="/assets/som_ativado.png" alt="Som" class="pixel-icon"></button>
+                    <button id="leave-btn" class="habbo-btn navbar-btn-my" title="Sair do Jogo"><img src="/assets/sair.png" alt="Sair" class="pixel-icon"></button>
+                </div>
+            </nav>
+
+            <div id="info">
+                <div id="ping" class="info-box">Ping: --</div>
+                <div id="fps" class="info-box">FPS: --</div>
+            </div>
+
+            <div id="canvasDiv">
+                <div id="go321"></div>
+                <div id="left-area" class="touch-area"></div>
+                <div id="right-area" class="touch-area"></div>
+            </div>
+
+            <div id="lock-overlay" class="arena-overlay">
+                <div class="lock-backdrop"></div>
+                <div class="lock-panel habbo-box">
+                    <img src="/assets/times.png" alt="Arena Times" class="lock-image">
+                    <div class="lock-content">
+                        <strong id="overlay-title">Arena Fechada</strong>
+                        <span id="overlay-copy">Você está na fila. A arena será liberada pelo painel admin.</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Habbo Tackle Button -->
+            <button id="tackle" class="habbo-btn habbo-btn-green" type="button">
+                <span>DESARME</span>
+                <small>Espaço / T / Touch</small>
             </button>
-            <button id="controls" class="btn btn-sm btn-primary navbar-btn-my mx-1 py-0" data-modal-target="#my-modal"
-            type="button" data-bs-toggle="modal" data-bs-target="#controlsModal">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-info" viewBox="0 0 16 16">
-                    <path d="m8.93 6.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588zM9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/>
-                </svg>
-            </button>
-            <button class="btn btn-primary navbar-btn-my btn-sm mx-1 py-0" id="mute-btn">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-volume-up" viewBox="0 0 16 16">
-                    <path d="M11.536 14.01A8.473 8.473 0 0 0 14.026 8a8.473 8.473 0 0 0-2.49-6.01l-.708.707A7.476 7.476 0 0 1 13.025 8c0 2.071-.84 3.946-2.197 5.303l.708.707z"/>
-                    <path d="M10.121 12.596A6.48 6.48 0 0 0 12.025 8a6.48 6.48 0 0 0-1.904-4.596l-.707.707A5.483 5.483 0 0 1 11.025 8a5.483 5.483 0 0 1-1.61 3.89l.706.706z"/>
-                    <path d="M10.025 8a4.486 4.486 0 0 1-1.318 3.182L8 10.475A3.489 3.489 0 0 0 9.025 8c0-.966-.392-1.841-1.025-2.475l.707-.707A4.486 4.486 0 0 1 10.025 8zM7 4a.5.5 0 0 0-.812-.39L3.825 5.5H1.5A.5.5 0 0 0 1 6v4a.5.5 0 0 0 .5.5h2.325l2.363 1.89A.5.5 0 0 0 7 12V4zM4.312 6.39 6 5.04v5.92L4.312 9.61A.5.5 0 0 0 4 9.5H2v-3h2a.5.5 0 0 0 .312-.11z"/>
-                </svg>
-            </button>
-            <button id="settings" class="btn btn-sm btn-primary navbar-btn-my mx-1 py-0" data-modal-target="#my-modal"
-            type="button" data-bs-toggle="modal" data-bs-target="#settingsModal">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-gear" viewBox="0 0 16 16">
-                    <path d="M8 4.754a3.246 3.246 0 1 0 0 6.492 3.246 3.246 0 0 0 0-6.492zM5.754 8a2.246 2.246 0 1 1 4.492 0 2.246 2.246 0 0 1-4.492 0z"/>
-                    <path d="M9.796 1.343c-.527-1.79-3.065-1.79-3.592 0l-.094.319a.873.873 0 0 1-1.255.52l-.292-.16c-1.64-.892-3.433.902-2.54 2.541l.159.292a.873.873 0 0 1-.52 1.255l-.319.094c-1.79.527-1.79 3.065 0 3.592l.319.094a.873.873 0 0 1 .52 1.255l-.16.292c-.892 1.64.901 3.434 2.541 2.54l.292-.159a.873.873 0 0 1 1.255.52l.094.319c.527 1.79 3.065 1.79 3.592 0l.094-.319a.873.873 0 0 1 1.255-.52l.292.16c1.64.893 3.434-.902 2.54-2.541l-.159-.292a.873.873 0 0 1 .52-1.255l.319-.094c1.79-.527 1.79-3.065 0-3.592l-.319-.094a.873.873 0 0 1-.52-1.255l.16-.292c.893-1.64-.902-3.433-2.541-2.54l-.292.159a.873.873 0 0 1-1.255-.52l-.094-.319zm-2.633.283c.246-.835 1.428-.835 1.674 0l.094.319a1.873 1.873 0 0 0 2.693 1.115l.291-.16c.764-.415 1.6.42 1.184 1.185l-.159.292a1.873 1.873 0 0 0 1.116 2.692l.318.094c.835.246.835 1.428 0 1.674l-.319.094a1.873 1.873 0 0 0-1.115 2.693l.16.291c.415.764-.42 1.6-1.185 1.184l-.291-.159a1.873 1.873 0 0 0-2.693 1.116l-.094.318c-.246.835-1.428.835-1.674 0l-.094-.319a1.873 1.873 0 0 0-2.692-1.115l-.292.16c-.764.415-1.6-.42-1.184-1.185l.159-.291A1.873 1.873 0 0 0 1.945 8.93l-.319-.094c-.835-.246-.835-1.428 0-1.674l.319-.094A1.873 1.873 0 0 0 3.06 4.377l-.16-.292c-.415-.764.42-1.6 1.185-1.184l.292.159a1.873 1.873 0 0 0 2.692-1.115l.094-.319z"/>
-                </svg>
-            </button>
-            <button id="team" class="btn btn-sm btn-primary navbar-btn-my mx-1 py-0" data-modal-target="#my-modal"
-            type="button" data-bs-toggle="modal" data-bs-target="#teamModal">Team</button>
-            <button id="aboutus" class="btn btn-sm btn-primary navbar-btn-my mx-1 py-0" data-modal-target="#my-modal"
-            type="button" data-bs-toggle="modal" data-bs-target="#aboutUsModal">AboutUs</button>
-        </div>
+        </section>
+
+        <aside class="arena-sidebar">
+            <section class="habbo-box side-panel">
+                <div class="habbo-box-header">
+                    <h2 id="player-name-label" class="habbo-box-title">Jogador</h2>
+                </div>
+                <div class="habbo-box-content no-padding">
+                    <div class="team-grid" style="padding: 10px;">
+                        <div>
+                            <h3 class="team-title-blue">Time Azul</h3>
+                            <div id="active-a" class="mini-list"></div>
+                        </div>
+                        <div>
+                            <h3 class="team-title-red">Time Vermelho</h3>
+                            <div id="active-b" class="mini-list"></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="habbo-box side-panel">
+                <div class="habbo-box-header">
+                    <h2 class="habbo-box-title">Próximos</h2>
+                </div>
+                <div class="habbo-box-content no-padding">
+                    <div class="team-grid" style="padding: 10px;">
+                        <div>
+                            <h3 class="team-title-blue">Time Azul</h3>
+                            <div id="next-a" class="mini-list"></div>
+                        </div>
+                        <div>
+                            <h3 class="team-title-red">Time Vermelho</h3>
+                            <div id="next-b" class="mini-list"></div>
+                        </div>
+                    </div>
+                    <div style="border-top: 1px solid #ccc;">
+                        <h3 style="padding: 5px 10px; margin: 0; font-size: 11px; color: #666; background: #e4e2df;">Fila Restante</h3>
+                        <div id="queue-list" class="queue-list" style="max-height: 100px; overflow-y: auto;"></div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="habbo-box side-panel" style="flex: 1; display: flex; flex-direction: column; min-height: 0;">
+                <div class="habbo-box-header chat-header">
+                    <img src="/assets/chat.png" alt="Chat" class="pixel-icon chat-icon">
+                    <h2 class="habbo-box-title">Chat</h2>
+                </div>
+                <div class="habbo-box-content chat-content">
+                    <div id="chat-log" class="chat-log"></div>
+                    <form id="chat-form" class="chat-form">
+                        <input id="chat-input" class="form-control" type="text" maxlength="220" placeholder="Falar no quarto...">
+                        <button class="habbo-btn" type="submit">FALAR</button>
+                    </form>
+                </div>
+            </section>
+        </aside>
+    </main>
+
+    <div id="help-modal" class="help-modal" role="dialog" aria-modal="true" aria-labelledby="help-title" aria-hidden="true">
+        <div class="help-modal__backdrop" data-help-close></div>
+        <section class="help-modal__panel habbo-box" style="z-index: 40;">
+            <div class="habbo-box-header">
+                <h2 id="help-title" class="habbo-box-title">Como jogar</h2>
+                <button class="habbo-btn" type="button" data-help-close>X</button>
+            </div>
+            <div class="habbo-box-content">
+                <div class="help-grid">
+                    <div class="help-row">
+                        <span class="help-key">W A S D</span>
+                        <span class="help-key">Setas</span>
+                        <p>Mover o jogador pelo campo.</p>
+                    </div>
+                    <div class="help-row">
+                        <span class="help-key">Mouse</span>
+                        <p>Mirar a direcao do chute.</p>
+                    </div>
+                    <div class="help-row">
+                        <span class="help-key">Clique</span>
+                        <p>Chutar quando voce estiver perto da bola.</p>
+                    </div>
+                    <div class="help-row">
+                        <span class="help-key">Espaco</span>
+                        <span class="help-key">T</span>
+                        <p>Desarme/carrinho: use perto da bola para tentar roubar a posse. Tem recarga curta.</p>
+                    </div>
+                    <div class="help-row">
+                        <span class="help-key">Mobile</span>
+                        <p>Lado esquerdo move, lado direito chuta, botao Desarme faz o carrinho.</p>
+                    </div>
+                </div>
+                <p class="help-note">Quem estiver na fila pode assistir e conversar no chat enquanto espera a rotacao.</p>
+            </div>
+        </section>
     </div>
-    
-    <!-- Info -->
-    <div id="info" class="row d-flex mx-2">
-        <div id="ping" class="btn btn-sm btn-dark row info-box">Ping:200</div>
-        <div id="fps" class="btn btn-sm btn-dark row info-box">FPS:60</div>
-        <!-- <div id="" class="btn btn-sm btn-dark mx-1 p-0 row"></div>
-        <div id="" class="btn btn-sm btn-dark mx-1 p-0 row"></div> -->
-        
-        <!-- <svg id="ping" viewBox="0 0 50 18" class="btn btn-sm btn-dark mx-1 p-0">
-            <text x="0" y="15" textLength="150%">Ping:200</text>
-        </svg>
-        <svg id="fps" viewBox="0 0 50 18" class="btn btn-sm btn-dark mx-1 p-0">
-            <text x="0" y="15">FPS:60</text>
-        </svg> -->
-    </div>
-    <!-- Canvas -->
-    <div id="canvasDiv">
-        <div id="go321"></div>
-        <div id="left-area" class="touch-area" data-bs-toggle="tooltip" data-bs-placement="right" title="Tooltip on left"></div>
-        <div id="right-area" class="touch-area"></div>
-    </div>
-    <button id="tackle" class="btn btn-primary p-0 d-lg-none" data-bs-toggle="tooltip" data-bs-placement="top" title="Tooltip on top">T</button>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous">
-    </script>
+
     <audio src="/assets/kick.mp3" id="kick-sound" preload="auto"></audio>
     <audio src="/assets/goal-sound.mp3" id="goal-sound" preload="auto"></audio>
-    <audio src="/assets/pocket.mp3" loop id="bg-sound"></audio> 
+    <audio src="/assets/pocket.mp3" loop id="bg-sound"></audio>
     <script src="/libraries/jquery.min.js"></script>
     <script src="/libraries/p5.js"></script>
     <script src="/socket.io/socket.io.js"></script>
     <script>
-        let roomName = "<%=roomName%>";
+        window.INITIAL_PLAYER_NAME = <%- JSON.stringify(playerName || '') %>;
     </script>
-    <script src="../libraries/joystick.js"></script>
+    <script src="/libraries/joystick.js"></script>
     <script src="/constants.js"></script>
     <script src="/game/field.js"></script>
     <script src="/game/cplayer.js"></script>
-    <script src="/game/cgame.js"></script>
     <script src="/game/cball.js"></script>
+    <script src="/game/cgame.js"></script>
     <script src="/game/helper.js"></script>
     <script src="/game/index.js"></script>
 </body>

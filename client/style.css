@@ -1,25 +1,663 @@
-html,
+@font-face {
+	font-family: 'Habbo Ubuntu';
+	src: url("/assets/OpenSans-Light.ttf") format("truetype");
+}
+@font-face {
+	font-family: 'Habbo Ubuntu Condensed';
+	src: url("/assets/OpenSans-Light.ttf") format("truetype");
+}
+@font-face {
+	font-family: 'Habbo Volter';
+	src: url("/assets/volter-goldfish.woff") format("woff");
+}
+@font-face {
+	font-family: 'Habbo Volter';
+	src: url("/assets/volter-bold-goldfish.woff") format("woff");
+	font-weight: bold;
+}
+
+:root {
+    --bg: #07080b; /* Game background fallback */
+    --text: #f7f8fb;
+    --accent: #ff2b3f;
+    --font-pixel: 'Habbo Volter', cursive;
+    --font-standard: 'Habbo Ubuntu', 'Verdana', 'Tahoma', sans-serif;
+
+    /* Legacy variables for admin */
+    --panel: rgba(18, 21, 29, 0.82);
+    --line: rgba(255, 255, 255, 0.1);
+    --radius: 8px;
+    --shadow: 0 24px 80px rgba(0, 0, 0, 0.45);
+    --font-display: 'Habbo Volter', cursive;
+    --muted: #9ca3af;
+
+    /* Habbo Theme Variables */
+    --habbo-box-bg: #e4e2df;
+    --habbo-box-border: #000000;
+    --habbo-header-bg: #cc1b1b;
+    --habbo-blue: #1c5b8e;
+    --habbo-grey-light: #f4f4f4;
+}
+
+.useFilter {
+	filter: url(#crispify);
+}
+svg {
+	display: none;
+}
+
+/* Base Body (Game usually uses class arena-body, fallback here) */
 body {
     padding: 0;
     margin: 0;
-    height: 100vh;
+    min-height: 100vh;
     width: 100vw;
+    font-family: var(--font-standard);
+    background-color: var(--bg);
+    color: var(--text);
     overflow: hidden;
 }
 
-body {
-    background-color: #6697c9;
-    position: fixed;
+/* -------------------------------------- */
+/* LOBBY SPECIFIC STYLES                  */
+/* -------------------------------------- */
+body:not(.arena-body) {
+    background: #181818 url("/assets/bg.png") no-repeat center center;
+    background-size: cover;
+    color: #000;
+    isolation: isolate;
+    position: relative;
 }
 
+body:not(.arena-body)::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    background:
+        linear-gradient(180deg, rgba(0, 0, 0, 0.48), rgba(0, 0, 0, 0.16) 38%, rgba(0, 0, 0, 0.62)),
+        rgba(10, 16, 24, 0.18);
+    pointer-events: none;
+}
+
+/* Loader */
 #loading {
     position: fixed;
-    background: #1175c7;
-    /* no-repeat center; */
-    display: flex;
-    width: 100%;
-    height: 100vh;
-    left: 0;
-    top: 0;
+    inset: 0;
     z-index: 1000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(5px);
+}
+
+.habbo-loader {
+    text-align: center;
+    color: #fff;
+    font-family: var(--font-pixel);
+    font-size: 24px;
+    text-shadow: 2px 2px 0 #000;
+}
+
+.spin-ball {
+    width: 60px;
+    height: 60px;
+    animation: spin 1s linear infinite;
+    margin-bottom: 10px;
+}
+
+@keyframes spin { 100% { transform: rotate(360deg); } }
+
+/* Main Layout */
+.habbo-lobby-container {
+    max-width: 1100px;
+    margin: 0 auto;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    box-sizing: border-box;
+    gap: 15px;
+}
+
+/* Header */
+.habbo-header {
+    background:
+        linear-gradient(90deg, rgba(228, 226, 223, 0.96), rgba(255, 255, 255, 0.9)),
+        var(--habbo-box-bg);
+    border: 2px solid #000;
+    border-radius: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    box-shadow: 4px 4px 0px rgba(0,0,0,0.3), inset 2px 2px 0px rgba(255,255,255,0.5), inset -2px -2px 0px rgba(0,0,0,0.1);
+    overflow: hidden;
+    position: relative;
+}
+
+.habbo-header::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, rgba(204, 27, 27, 0.14), rgba(255, 255, 255, 0.08), rgba(28, 91, 142, 0.14));
+    pointer-events: none;
+}
+
+.habbo-header > * {
+    position: relative;
+    z-index: 1;
+}
+
+.main-logo {
+    height: 50px;
+    image-rendering: pixelated;
+    filter: drop-shadow(2px 2px 0 #000);
+}
+
+.habbo-motto {
+    font-family: var(--font-pixel);
+    color: #cc1b1b;
+    font-size: clamp(18px, 3vw, 28px);
+    text-transform: uppercase;
+    text-shadow: 1px 1px 0 rgba(0,0,0,0.2);
+    font-weight: 900;
+}
+
+/* Content Area */
+.habbo-content {
+    display: flex;
+    flex: 1;
+    gap: 15px;
+    overflow: hidden;
+}
+
+/* Boxes */
+.habbo-box {
+    background: var(--habbo-box-bg);
+    border: 2px solid var(--habbo-box-border);
+    border-radius: 8px;
+    box-shadow: inset -2px -2px 0px rgba(0,0,0,0.1), inset 2px 2px 0px rgba(255,255,255,0.5), 4px 4px 0px rgba(0,0,0,0.3);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.habbo-box-header {
+    background: var(--habbo-header-bg);
+    color: #fff;
+    padding: 8px 12px;
+    border-bottom: 2px solid var(--habbo-box-border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: inset 0px 2px 0px rgba(255,255,255,0.2);
+}
+
+.habbo-box-title {
+    font-family: var(--font-pixel);
+    font-size: 20px;
+    margin: 0;
+    text-shadow: 1px 1px 0 #000;
+}
+
+.habbo-box-content {
+    padding: 15px;
+    flex: 1;
+    overflow-y: auto;
+}
+
+.habbo-box-content.no-padding {
+    padding: 0;
+}
+
+/* Login Form Area */
+.status-bar {
+    background: #fff;
+    border: 2px solid #000;
+    border-radius: 4px;
+    padding: 8px 12px;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: var(--font-pixel);
+    font-size: 18px;
+    box-shadow: inset 1px 1px 3px rgba(0,0,0,0.2);
+}
+
+.status-label {
+    color: #666;
+}
+
+.status-value {
+    color: #d9534f;
+    font-weight: bold;
+}
+
+.habbo-form label {
+    font-family: var(--font-standard);
+    font-weight: bold;
+    font-size: 13px;
+    margin-bottom: 5px;
+    display: block;
+    color: #333;
+}
+
+.input-group {
+    display: flex;
+    gap: 10px;
+}
+
+.habbo-form input {
+    flex: 1;
+    padding: 10px;
+    border: 2px solid #000;
+    border-radius: 4px;
+    font-family: var(--font-standard);
+    font-size: 16px;
+    background: #fff;
+    box-shadow: inset 2px 2px 4px rgba(0,0,0,0.1);
+    outline: none;
+}
+
+.habbo-form input:focus {
+    background: #ffffe0;
+}
+
+.habbo-btn {
+    border: 2px solid #000;
+    border-radius: 4px;
+    font-family: var(--font-pixel);
+    font-size: 18px;
+    padding: 0 15px;
+    cursor: pointer;
+    text-transform: uppercase;
+    box-shadow: inset 2px 2px 0px rgba(255,255,255,0.3), 2px 2px 0px rgba(0,0,0,0.5);
+    transition: all 0.1s;
+    outline: none;
+}
+
+.habbo-btn:active {
+    transform: translate(2px, 2px);
+    box-shadow: inset 2px 2px 0px rgba(255,255,255,0.3), 0px 0px 0px rgba(0,0,0,0.5);
+}
+
+.habbo-btn-green {
+    background: #4ca64c;
+    color: #fff;
+    text-shadow: 1px 1px 0 #000;
+}
+
+.help-text {
+    font-size: 12px;
+    color: #555;
+    margin-top: 10px;
+    margin-bottom: 0;
+}
+
+/* Top Info Cards */
+.habbo-info-cards-top {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 15px;
+}
+
+.info-card {
+    background: #fff;
+    border: 2px solid #000;
+    border-radius: 4px;
+    box-shadow: 4px 4px 0px rgba(0,0,0,0.3);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.img-wrapper {
+    height: 100px;
+    background: #e4e2df;
+    border-bottom: 2px solid #000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.img-wrapper img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    image-rendering: pixelated;
+}
+
+.card-body {
+    padding: 10px;
+    font-size: 13px;
+    color: #333;
+    line-height: 1.4;
+}
+
+.card-body p {
+    margin: 0;
+}
+
+.lobby-info-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 22px 24px;
+    margin-top: 24px;
+}
+
+.lobby-info-item {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    text-align: center;
+}
+
+.lobby-info-img {
+    filter: drop-shadow(2px 2px 0 rgba(0, 0, 0, 0.32));
+    height: 86px;
+    image-rendering: pixelated;
+    object-fit: contain;
+    width: min(100%, 320px);
+}
+
+.lobby-info-item p {
+    color: #333;
+    font-size: 14px;
+    line-height: 1.45;
+    margin: 10px 0 0;
+    max-width: 310px;
+}
+
+.lobby-chat-note {
+    margin: 22px auto 0;
+    max-width: 650px;
+    color: #333;
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1.45;
+    text-align: center;
+}
+
+/* Entrance Grid */
+.entrance-grid {
+    display: grid;
+    grid-template-columns: 1fr 340px;
+    padding: 0 !important;
+}
+
+.entrance-left {
+    padding: 20px;
+}
+
+.entrance-right {
+    display: flex;
+    flex-direction: column;
+    border-left: 2px solid #000;
+    background: #fff;
+}
+
+.queue-inner-title {
+    background: #e4e2df;
+    margin: 0;
+    padding: 8px 12px;
+    font-size: 14px;
+    color: #333;
+    border-bottom: 2px solid #000;
+    text-transform: uppercase;
+}
+
+.queue-scroll-area {
+    flex: 1;
+    overflow-y: auto;
+    max-height: 250px;
+}
+
+.queue-count-badge {
+    background: #000;
+    color: #fff;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-family: var(--font-standard);
+    font-weight: bold;
+}
+
+.admin-list {
+    display: flex;
+    flex-direction: column;
+}
+
+.admin-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 12px;
+    border-bottom: 1px solid #ccc;
+    background: #fff;
+    font-family: var(--font-standard);
+    font-size: 13px;
+    font-weight: bold;
+}
+
+.admin-item:nth-child(even) {
+    background: var(--habbo-grey-light);
+}
+
+.admin-item:hover {
+    background: #e0f0fa;
+}
+
+.name-with-head {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.queue-name {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.queue-name small {
+    color: #888;
+    font-size: 12px;
+    font-weight: normal;
+}
+
+.habbo-head {
+    width: 32px;
+    height: 32px;
+    object-fit: contain;
+    image-rendering: pixelated;
+    background: transparent;
+}
+
+/* Footer */
+.habbo-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--habbo-box-bg);
+    padding: 8px 15px;
+    border: 2px solid #000;
+    border-radius: 8px;
+    color: #333;
+    font-family: var(--font-pixel);
+    font-size: 16px;
+    box-shadow: 4px 4px 0px rgba(0,0,0,0.3), inset 2px 2px 0px rgba(255,255,255,0.5), inset -2px -2px 0px rgba(0,0,0,0.1);
+}
+
+.footer-copy {
+    text-shadow: none;
+}
+
+.footer-credit {
+    align-items: center;
+    color: #333;
+    display: inline-flex;
+    gap: 8px;
+    min-width: 0;
+}
+
+.footer-credit span {
+    opacity: 0.75;
+}
+
+.footer-credit strong {
+    color: #cc1b1b;
+}
+
+.footer-head {
+    filter: drop-shadow(1px 1px 0 rgba(0, 0, 0, 0.45));
+    height: 34px;
+    image-rendering: pixelated;
+    object-fit: contain;
+    width: 34px;
+}
+
+.admin-link {
+    color: #cc1b1b;
+    text-decoration: none;
+    text-shadow: none;
+    transition: color 0.2s;
+}
+
+.admin-link:hover {
+    color: #fff;
+    text-decoration: underline;
+}
+
+/* -------------------------------------- */
+/* GLOBALS FOR GAME & MODALS              */
+/* -------------------------------------- */
+button,
+input,
+select,
+.btn,
+.form-control,
+.form-select {
+    border-radius: 4px !important;
+}
+
+.btn {
+    border: 2px solid #000 !important;
+    font-family: var(--font-pixel) !important;
+    font-weight: 700;
+    text-transform: uppercase;
+    transition: transform 100ms ease;
+    box-shadow: 2px 2px 0px rgba(0,0,0,0.5) !important;
+}
+
+.btn:active {
+    transform: translateY(2px) translateX(2px) !important;
+    box-shadow: 0px 0px 0px rgba(0,0,0,0.5) !important;
+}
+
+.btn-primary,
+.btn-danger {
+    background: var(--accent) !important;
+    color: #fff !important;
+}
+
+.btn-secondary,
+.btn-dark {
+    background: #333 !important;
+    color: #fff !important;
+}
+
+.form-control,
+.form-select,
+input[type="text"] {
+    background: rgba(255, 255, 255, 0.9) !important;
+    border: 2px solid #000 !important;
+    color: #000 !important;
+    box-shadow: none !important;
+}
+
+.form-control:focus,
+.form-select:focus,
+input[type="text"]:focus {
+    border-color: var(--accent) !important;
+    box-shadow: inset 2px 2px 4px rgba(0,0,0,0.1) !important;
+}
+
+/* Modals */
+.modal-content {
+    background: var(--habbo-box-bg) !important;
+    border: 2px solid #000 !important;
+    color: #000 !important;
+    border-radius: 8px !important;
+    box-shadow: 4px 4px 0px rgba(0,0,0,0.3) !important;
+}
+
+.modal-header,
+.modal-footer {
+    border-color: #000 !important;
+    background: var(--habbo-header-bg) !important;
+    color: #fff !important;
+}
+
+.modal-title {
+    font-family: var(--font-pixel) !important;
+    letter-spacing: 0;
+    text-transform: uppercase;
+}
+
+.btn-close {
+    filter: invert(1) grayscale(1) brightness(200%);
+    opacity: 0.8;
+}
+
+/* SVGs */
+#svg-loader {
+    margin: auto;
+    filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.5));
+}
+
+@media (max-width: 820px) {
+    .habbo-content {
+        flex-direction: column;
+        overflow-y: auto;
+    }
+    .habbo-lobby-container {
+        height: auto;
+    }
+    .habbo-info-cards-top {
+        grid-template-columns: 1fr 1fr;
+    }
+    .entrance-grid {
+        grid-template-columns: 1fr;
+    }
+    .entrance-right {
+        border-left: none;
+        border-top: 2px solid #000;
+    }
+    .habbo-footer {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 8px;
+    }
+}
+
+@media (max-width: 520px) {
+    .habbo-header {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 8px;
+    }
+    .lobby-info-grid {
+        grid-template-columns: 1fr;
+    }
+    .input-group {
+        flex-direction: column;
+    }
+    .habbo-btn {
+        min-height: 42px;
+    }
 }

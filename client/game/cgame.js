@@ -36,6 +36,12 @@ class Game{
             if(!(key in this.players)){
                 this.players[key] = new Player(key,0,0,C.playerRadius,playerData[key].username);
             }
+            if(playerData[key].teamName && this.players[key].teamName !== playerData[key].teamName){
+                this.players[key].changeTeam(playerData[key].teamName);
+            }
+            if(playerData[key].username){
+                this.players[key].changeName(playerData[key].username);
+            }
             Object.assign(this.players[key],playerData[key]);
         }
         for(let key in this.players){

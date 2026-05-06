@@ -52,7 +52,61 @@ const UserModelSchema = new mongoose.Schema({
   }
 });
 
+const PlayerProfileSchema = new mongoose.Schema({
+  name: {
+    type: String,
+    required: true,
+    unique: true,
+    trim: true
+  },
+  points: {
+    type: Number,
+    default: 0
+  },
+  goals: {
+    type: Number,
+    default: 0
+  },
+  wins: {
+    type: Number,
+    default: 0
+  },
+  matches: {
+    type: Number,
+    default: 0
+  },
+  lastSeen: {
+    type: Date,
+    default: Date.now
+  }
+}, { timestamps: true });
+
+const QueueEntrySchema = new mongoose.Schema({
+  name: {
+    type: String,
+    required: true,
+    unique: true,
+    trim: true
+  },
+  position: {
+    type: Number,
+    default: 0
+  },
+  online: {
+    type: Boolean,
+    default: false
+  },
+  lastSeen: {
+    type: Date,
+    default: Date.now
+  }
+}, { timestamps: true });
+
 const UserModel = mongoose.model('User', UserModelSchema);
 const VisitModel = mongoose.model('Visit',VisitModelSchema);
+const PlayerProfileModel = mongoose.model('PlayerProfile', PlayerProfileSchema);
+const QueueEntryModel = mongoose.model('QueueEntry', QueueEntrySchema);
 module.exports.UserModel = UserModel;
 module.exports.VisitModel = VisitModel;
+module.exports.PlayerProfileModel = PlayerProfileModel;
+module.exports.QueueEntryModel = QueueEntryModel;

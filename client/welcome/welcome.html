@@ -1,204 +1,214 @@
-<!DOCTYPE html>
-<html lang="en">
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <link rel="manifest" href="/manifest.json" />
+    <meta name="keywords" content="Realtime,Soccer,Game,Training" />
+    <meta
+      name="description"
+      content="É hora de descobrir quem são os treinadores mais pernetas! Vem pro futzin dos treinadores!"
+    />
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <title>[TRE] Futzin dos Treinadores</title>
+    <meta property="og:locale" content="pt_BR" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="[TRE] Futzin dos Treinadores" />
+    <meta property="og:title" content="[TRE] Futzin dos Treinadores" />
+    <meta
+      property="og:description"
+      content="É hora de descobrir quem são os treinadores mais pernetas! Vem pro futzin dos treinadores!"
+    />
+    <meta property="og:image" content="/assets/Logo_Game.png" />
+    <meta property="og:image:alt" content="Logo do [TRE] Futzin dos Treinadores" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="[TRE] Futzin dos Treinadores" />
+    <meta
+      name="twitter:description"
+      content="É hora de descobrir quem são os treinadores mais pernetas! Vem pro futzin dos treinadores!"
+    />
+    <meta name="twitter:image" content="/assets/Logo_Game.png" />
+    <link rel="icon" type="image/x-icon" href="/assets/favicon.ico" />
+    <link rel="apple-touch-icon" href="/assets/favicon-192.png" />
+    <!-- Custom Fonts are loaded in style.css -->
+    <link rel="stylesheet" href="/style.css" />
+  </head>
 
-<head>
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <link rel="manifest" href="/manifest.json">
-    <meta name="keywords" content="Realtime,Soccer,Game,Fun">
-    <meta name="description" content="Try this realtime soccer game" />
-    <meta property="og:site_name" content="Real Soccer">
-    <meta property="og:title" content="Real Soccer" />
-    <meta property="og:description" content="Try this realtime soccer game" />
-    <meta property="og:image" itemprop="image" content="https://counter-view.herokuapp.com/assets/readme/thumbnail.png">
-    <meta property="og:image:secure_url" itemprop="image"
-        content="https://counter-view.herokuapp.com/assets/readme/thumbnail.png">
-    <meta property="og:type" content="game" />
-    <link rel="stylesheet" href="/homescreen/addtohomescreen.css">
-    <script src="/homescreen/addtohomescreen.js"></script>
-
-
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Soccer</title>
-    <link rel="shortcut icon" href="./assets/favicon.ico">
-    <link rel="stylesheet" href="/style.css">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
-        integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
-    <style>
-        html {
-            height: 100vh;
-            width: 100vw;
-            padding: 0;
-            margin: 0;
-            /* overflow: hidden; */
-            /* box-sizing: border-box; */
-        }
-
-        body {
-            background-image: url('../assets/wp1.jpg');
-            background-position: center center;
-            background-repeat: no-repeat;
-            background-size: cover;
-        }
-
-        table th {
-            position: -webkit-sticky;
-            position: sticky;
-            top: 0;
-        }
-    </style>
-</head>
-
-<body>
-    <!-- Loading -->
-    <div id="loading" style="display: none;">
-        <svg id="svg-loader" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
-            style="margin: auto; background: rgba(241, 242, 243, 0); display: block;" width="204px" height="204px"
-            viewBox="0 0 100 100" preserveAspectRatio="xMidYMid">
-            <g transform="translate(50 50)">
-                <g transform="translate(-19 -19) scale(0.6)">
-                    <g>
-                        <animateTransform attributeName="transform" type="rotate" values="0;45" keyTimes="0;1"
-                            dur="0.2s" begin="0s" repeatCount="indefinite"></animateTransform>
-                        <path
-                            d="M31.924705322619776 20.610996823635016 L38.99577313448525 27.682064635500492 L27.682064635500492 38.99577313448525 L20.610996823635016 31.924705322619776 A38 38 0 0 1 8 37.14835124201342 L8 37.14835124201342 L8 47.14835124201342 L-7.999999999999995 47.14835124201342 L-7.999999999999996 37.14835124201342 A38 38 0 0 1 -20.610996823635006 31.92470532261978 L-20.610996823635006 31.92470532261978 L-27.68206463550048 38.995773134485255 L-38.99577313448525 27.68206463550049 L-31.924705322619776 20.610996823635013 A38 38 0 0 1 -37.14835124201342 8.00000000000001 L-37.14835124201342 8.00000000000001 L-47.14835124201342 8.000000000000012 L-47.14835124201342 -8 L-37.14835124201342 -8.000000000000002 A38 38 0 0 1 -31.924705322619783 -20.610996823635006 L-31.924705322619783 -20.610996823635006 L-38.99577313448526 -27.682064635500478 L-27.68206463550051 -38.99577313448523 L-20.61099682363503 -31.924705322619765 A38 38 0 0 1 -7.9999999999999964 -37.14835124201342 L-7.9999999999999964 -37.14835124201342 L-7.999999999999998 -47.14835124201342 L7.9999999999999805 -47.14835124201342 L7.999999999999982 -37.14835124201342 A38 38 0 0 1 20.610996823635016 -31.924705322619776 L20.610996823635016 -31.924705322619776 L27.68206463550049 -38.995773134485255 L38.99577313448524 -27.68206463550051 L31.924705322619765 -20.61099682363503 A38 38 0 0 1 37.14835124201342 -7.999999999999998 L37.14835124201342 -7.999999999999998 L47.14835124201342 -8 L47.148351242013426 7.999999999999978 L37.148351242013426 7.9999999999999805 A38 38 0 0 1 31.924705322619776 20.610996823635013 M0 -23A23 23 0 1 0 0 23 A23 23 0 1 0 0 -23"
-                            fill="#62f22d"></path>
-                    </g>
-                </g>
-                <g transform="translate(19 19) scale(0.6)">
-                    <g>
-                        <animateTransform attributeName="transform" type="rotate" values="45;0" keyTimes="0;1"
-                            dur="0.2s" begin="-0.1s" repeatCount="indefinite"></animateTransform>
-                        <path
-                            d="M-31.924705322619783 -20.610996823635006 L-38.99577313448526 -27.682064635500478 L-27.68206463550051 -38.99577313448523 L-20.61099682363503 -31.924705322619765 A38 38 0 0 1 -7.9999999999999964 -37.14835124201342 L-7.9999999999999964 -37.14835124201342 L-7.999999999999998 -47.14835124201342 L7.9999999999999805 -47.14835124201342 L7.999999999999982 -37.14835124201342 A38 38 0 0 1 20.610996823635016 -31.924705322619776 L20.610996823635016 -31.924705322619776 L27.68206463550049 -38.995773134485255 L38.99577313448524 -27.68206463550051 L31.924705322619765 -20.61099682363503 A38 38 0 0 1 37.14835124201342 -7.999999999999998 L37.14835124201342 -7.999999999999998 L47.14835124201342 -8 L47.148351242013426 7.999999999999978 L37.148351242013426 7.9999999999999805 A38 38 0 0 1 31.924705322619776 20.610996823635013 L31.924705322619776 20.610996823635013 L38.995773134485255 27.68206463550049 L27.682064635500513 38.99577313448523 L20.610996823635034 31.92470532261976 A38 38 0 0 1 8 37.14835124201342 L8 37.14835124201342 L8.000000000000004 47.14835124201342 L-7.999999999999976 47.148351242013426 L-7.999999999999979 37.148351242013426 A38 38 0 0 1 -20.610996823634984 31.924705322619797 L-20.610996823634984 31.924705322619797 L-27.68206463550045 38.99577313448528 L-38.99577313448521 27.682064635500545 L-31.924705322619744 20.610996823635062 A38 38 0 0 1 -37.14835124201342 8.000000000000004 L-37.14835124201342 8.000000000000004 L-47.14835124201342 8.000000000000007 L-47.148351242013426 -7.999999999999972 L-37.148351242013426 -7.999999999999975 A38 38 0 0 1 -31.924705322619758 -20.610996823635038 M0 -23A23 23 0 1 0 0 23 A23 23 0 1 0 0 -23"
-                            fill="#00ffa2"></path>
-                    </g>
-                </g>
-            </g>
-        </svg>
-    </div> 
-    <!-- Modal -->
-    <div class="modal fade" id="joinModal" tabindex="-1" aria-labelledby="joinModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-            <h5 class="modal-title" id="joinModalLabel">Enter room-code</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <input type="text" class="form-control" id="recipient-name"
-                    onchange="hrefUpdate(this)" style="text-transform:uppercase" >
-            </div>
-            <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-            <a id="popjoin" href=""><button type="button" class="btn btn-primary">Join Room</button></a>
-            </div>
-        </div>
-        </div>
+  <body>
+    <svg
+      style="display: none; position: absolute; width: 0; height: 0"
+      xmlns="http://www.w3.org/2000/svg"
+      version="1.1"
+    >
+      <defs>
+        <filter id="crispify">
+          <feComponentTransfer>
+            <feFuncA type="discrete" tableValues="0 1" />
+          </feComponentTransfer>
+        </filter>
+      </defs>
+    </svg>
+    <div id="loading" style="display: none">
+      <div class="habbo-loader">
+        <img src="/assets/ball-dark-light.png" class="spin-ball" alt="Bola" />
+        <p>CARREGANDO...</p>
+      </div>
     </div>
-  
-    <div class="d-flex justify-content-evenly align-items-center row mx-1 my-0" style="height: 98vh;">
-        <div class="container d-flex justify-content-center align-items-center" style="height:10%;">
-            <img src="../assets/RealSoccerM.png" alt="">
-        </div>
 
-        <div class="row align-items-center justify-content-evenly mx-0 my-0 py-0 px-1"
-            style="color: white; height: 70%;">
-            <div
-                class="col-12 col-sm-4 col-lg-3 border border-primary d-flex flex-column justify-content-center align-items-center">
-                <div class="row d-flex mx-0 px-0 align-items-center justify-content-center">
-                    <div class="row">
-                        <h3 class=" d-flex justify-content-center align-items-center py-2">About Me</h3>
-                    </div>
-                    <div class="row">
-                        <div class="col-4 d-flex align-items-center justify-content-center border">Name</div>
-                        <div class="col-8 px-0">
-                            <input type="text" class="form-control" id="player-name"> 
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="d-grid px-0">
-                            <button class="btn btn-primary" id="save-name-btn">Save</button>
-                        </div>
-                    </div>
-                </div>
-                <div class="row d-flex justify-content-end align-self-stretch my-3 px-0 mx-0">
-                    <div class="col-6">
-                        <a href="room/create" id="create" style="text-decoration: none;">
-                            <div class="d-grid">
-                                <div class="btn btn-primary">Create</div>
-                            </div>
-                        </a>
-                    </div>
-                    <div class="col-6">
-                        <div class="d-grid">
-                            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#joinModal">
-                                Join
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-12 col-sm-5 col-lg-3 my-0 py-0">
-                <div class="container border border-primary px-0">
-                    <div class="row">
-                        <h3 class="d-flex justify-content-center align-items-center">Top Rooms</h3>
-                    </div>
-                    <div class="border border-primary" style="min-height: 100px; max-height: 200px;overflow-y: scroll;">
-
-
-                        <table class="table table-striped table-hover py-0 my-0">
-                            <thead>
-                                <tr class="table-dark">
-                                    <th>Room Code</th>
-                                    <th>Player Count</th>
-                                    <th>Join</th>
-                                </tr>
-                            </thead>
-                            <tbody id="room-list">
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
+    <main class="habbo-lobby-container">
+      <!-- Header -->
+      <header class="habbo-header">
+        <div class="logo-area">
+          <img src="/assets/Logo_Game.png" alt="Logo Game" class="main-logo" />
         </div>
-        <div class="row" style="color: white;">
-            <div class="col col-3 d-flex justify-content-start">
-                Source Code
-                <img alt="svgImg" style="max-width: 30px; padding: 0px 2px; cursor: pointer;" onclick="document.location.href='https://github.com/bhuvan-byte/street-soccer-multi'" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHg9IjBweCIgeT0iMHB4Igp3aWR0aD0iNjQiIGhlaWdodD0iNjQiCnZpZXdCb3g9IjAgMCA2NCA2NCIKc3R5bGU9IiBmaWxsOiMwMDAwMDA7Ij48bGluZWFyR3JhZGllbnQgaWQ9IktwekhfdHRUTUlqcThkaHgxekQycGFfNTI1MzlfZ3IxIiB4MT0iMzAuOTk5IiB4Mj0iMzAuOTk5IiB5MT0iMTYiIHkyPSI1NS4zNDIiIGdyYWRpZW50VW5pdHM9InVzZXJTcGFjZU9uVXNlIiBzcHJlYWRNZXRob2Q9InJlZmxlY3QiPjxzdG9wIG9mZnNldD0iMCIgc3RvcC1jb2xvcj0iIzZkYzdmZiI+PC9zdG9wPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iI2U2YWJmZiI+PC9zdG9wPjwvbGluZWFyR3JhZGllbnQ+PHBhdGggZmlsbD0idXJsKCNLcHpIX3R0VE1JanE4ZGh4MXpEMnBhXzUyNTM5X2dyMSkiIGQ9Ik0yNS4wMDgsNTYuMDA3Yy0wLjAwMy0wLjM2OC0wLjAwNi0xLjk2Mi0wLjAwOS0zLjQ1NGwtMC4wMDMtMS41NSBjLTYuNzI5LDAuOTE1LTguMzU4LTMuNzgtOC4zNzYtMy44M2MtMC45MzQtMi4zNjgtMi4yMTEtMy4wNDUtMi4yNjYtMy4wNzNsLTAuMTI0LTAuMDcyYy0wLjQ2My0wLjMxNi0xLjY5MS0xLjE1Ny0xLjM0Mi0yLjI2MyBjMC4zMTUtMC45OTcsMS41MzYtMS4xLDIuMDkxLTEuMDgyYzMuMDc0LDAuMjE1LDQuNjMsMi45NzgsNC42OTQsMy4wOTVjMS41NjksMi42ODksMy45NjQsMi40MTEsNS41MDksMS44NDQgYzAuMTQ0LTAuNjg4LDAuMzY3LTEuMzIsMC42NTktMS44NzhDMjAuODg1LDQyLjg2NSwxNS4yNyw0MC4yMjksMTUuMjcsMzAuNjRjMC0yLjYzMywwLjgyLTQuOTYsMi40NDEtNi45MjkgYy0wLjM2Mi0xLjIwNi0wLjc3NC0zLjY2NiwwLjQ0Ni02Ljc2NWwwLjE3NC0wLjQ0MmwwLjQ1Mi0wLjE0NGMwLjQxNi0wLjEzNywyLjY4OC0wLjYyNCw3LjM1OSwyLjQzMyBjMS45MjgtMC40OTQsMy45NjktMC43NDksNi4wNzQtMC43NTljMi4xMTUsMC4wMSw0LjE1OCwwLjI2NSw2LjA5LDAuNzU5YzQuNjY3LTMuMDU4LDYuOTM0LTIuNTY1LDcuMzUxLTIuNDMzbDAuNDUxLDAuMTQ1IGwwLjE3NCwwLjQ0YzEuMjI1LDMuMDk4LDAuODEzLDUuNTU5LDAuNDUxLDYuNzY2YzEuNjE4LDEuOTYzLDIuNDM4LDQuMjkxLDIuNDM4LDYuOTI5YzAsOS41OTEtNS42MjEsMTIuMjE5LTEwLjU4OCwxMy4wODcgYzAuNTYzLDEuMDY1LDAuODY4LDIuNDAyLDAuODY4LDMuODc4YzAsMS42ODMtMC4wMDcsNy4yMDQtMC4wMTUsOC40MDJsLTItMC4wMTRjMC4wMDgtMS4xOTYsMC4wMTUtNi43MDgsMC4wMTUtOC4zODkgYzAtMi40NDItMC45NDMtMy41MjItMS4zNS0zLjg3NGwtMS43My0xLjQ5N2wyLjI3NC0wLjI1M2M1LjIwNS0wLjU3OCwxMC41MjUtMi4zNzksMTAuNTI1LTExLjM0MWMwLTIuMzMtMC43NzctNC4zNjEtMi4zMS02LjAzNiBsLTAuNDMtMC40NjlsMC4yNDItMC41ODdjMC4xNjYtMC40MDEsMC44OTQtMi40NDItMC4wNDMtNS4yOTFjLTAuNzU4LDAuMDQ1LTIuNTY4LDAuNDAyLTUuNTg0LDIuNDQ3bC0wLjM4NCwwLjI1OWwtMC40NDUtMC4xMjMgYy0xLjg2My0wLjUxOC0zLjkzOC0wLjc5Ni02LjAwMS0wLjgwNmMtMi4wNTIsMC4wMS00LjEyNCwwLjI4OC01Ljk4NCwwLjgwNmwtMC40NDUsMC4xMjNsLTAuMzgzLTAuMjU5IGMtMy4wMTktMi4wNDQtNC44MzMtMi40MDQtNS41OTQtMi40NDljLTAuOTM1LDIuODUxLTAuMjA2LDQuODkyLTAuMDQsNS4yOTNsMC4yNDIsMC41ODdsLTAuNDI5LDAuNDY5IGMtMS41MzYsMS42ODEtMi4zMTQsMy43MTItMi4zMTQsNi4wMzZjMCw4Ljk1OCw1LjMxLDEwLjc3LDEwLjUwNCwxMS4zNjFsMi4yNTIsMC4yNTZsLTEuNzA4LDEuNDkgYy0wLjM3MiwwLjMyNS0xLjAzLDEuMTEyLTEuMjU0LDIuNzI3bC0wLjA3NSwwLjU0OWwtMC41MDYsMC4yMjdjLTEuMzIxLDAuNTkyLTUuODM5LDIuMTYyLTguNTQ4LTIuNDg1IGMtMC4wMTUtMC4wMjUtMC41NDQtMC45NDUtMS41MDItMS41NTdjMC42NDYsMC42MzksMS40MzMsMS42NzMsMi4wNjgsMy4yODdjMC4wNjYsMC4xOSwxLjM1NywzLjYyMiw3LjI4LDIuMzM5bDEuMjA2LTAuMjYyIGwwLjAxMiwzLjk3OGMwLjAwMywxLjQ4NywwLjAwNiwzLjA3NiwwLjAwOSwzLjQ0NEwyNS4wMDgsNTYuMDA3eiI+PC9wYXRoPjxsaW5lYXJHcmFkaWVudCBpZD0iS3B6SF90dFRNSWpxOGRoeDF6RDJwYl81MjUzOV9ncjIiIHgxPSIzMiIgeDI9IjMyIiB5MT0iNSIgeTI9IjU5LjE2NyIgZ3JhZGllbnRVbml0cz0idXNlclNwYWNlT25Vc2UiIHNwcmVhZE1ldGhvZD0icmVmbGVjdCI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjMWE2ZGZmIj48L3N0b3A+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjYzgyMmZmIj48L3N0b3A+PC9saW5lYXJHcmFkaWVudD48cGF0aCBmaWxsPSJ1cmwoI0twekhfdHRUTUlqcThkaHgxekQycGJfNTI1MzlfZ3IyKSIgZD0iTTMyLDU4QzE3LjY2Myw1OCw2LDQ2LjMzNyw2LDMyUzE3LjY2Myw2LDMyLDZzMjYsMTEuNjYzLDI2LDI2UzQ2LjMzNyw1OCwzMiw1OHogTTMyLDggQzE4Ljc2Nyw4LDgsMTguNzY3LDgsMzJzMTAuNzY3LDI0LDI0LDI0czI0LTEwLjc2NywyNC0yNFM0NS4yMzMsOCwzMiw4eiI+PC9wYXRoPjwvc3ZnPg=="/>
-            </div>
-            <div class="col col-9 d-flex justify-content-end">
-                Created & Maintained by Bhuvan <img alt="svgImg" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHg9IjBweCIgeT0iMHB4Igp3aWR0aD0iNDgiIGhlaWdodD0iNDgiCnZpZXdCb3g9IjAgMCA0OCA0OCIKc3R5bGU9IiBmaWxsOiMwMDAwMDA7Ij48cGF0aCBmaWxsPSIjMDI4OEQxIiBkPSJNNDIsMzdjMCwyLjc2Mi0yLjIzOCw1LTUsNUgxMWMtMi43NjEsMC01LTIuMjM4LTUtNVYxMWMwLTIuNzYyLDIuMjM5LTUsNS01aDI2YzIuNzYyLDAsNSwyLjIzOCw1LDVWMzd6Ij48L3BhdGg+PHBhdGggZmlsbD0iI0ZGRiIgZD0iTTEyIDE5SDE3VjM2SDEyek0xNC40ODUgMTdoLS4wMjhDMTIuOTY1IDE3IDEyIDE1Ljg4OCAxMiAxNC40OTkgMTIgMTMuMDggMTIuOTk1IDEyIDE0LjUxNCAxMmMxLjUyMSAwIDIuNDU4IDEuMDggMi40ODYgMi40OTlDMTcgMTUuODg3IDE2LjAzNSAxNyAxNC40ODUgMTd6TTM2IDM2aC01di05LjA5OWMwLTIuMTk4LTEuMjI1LTMuNjk4LTMuMTkyLTMuNjk4LTEuNTAxIDAtMi4zMTMgMS4wMTItMi43MDcgMS45OUMyNC45NTcgMjUuNTQzIDI1IDI2LjUxMSAyNSAyN3Y5aC01VjE5aDV2Mi42MTZDMjUuNzIxIDIwLjUgMjYuODUgMTkgMjkuNzM4IDE5YzMuNTc4IDAgNi4yNjEgMi4yNSA2LjI2MSA3LjI3NEwzNiAzNiAzNiAzNnoiPjwvcGF0aD48L3N2Zz4=" style="max-width: 30px; padding: 0px 4px; cursor: pointer;" onclick="document.location.href='https://www.linkedin.com/in/bhuvan1'"/>
-                
-                & 
-                
-                Raahil <img alt="svgImg" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHg9IjBweCIgeT0iMHB4Igp3aWR0aD0iNDgiIGhlaWdodD0iNDgiCnZpZXdCb3g9IjAgMCA0OCA0OCIKc3R5bGU9IiBmaWxsOiMwMDAwMDA7Ij48cGF0aCBmaWxsPSIjMDI4OEQxIiBkPSJNNDIsMzdjMCwyLjc2Mi0yLjIzOCw1LTUsNUgxMWMtMi43NjEsMC01LTIuMjM4LTUtNVYxMWMwLTIuNzYyLDIuMjM5LTUsNS01aDI2YzIuNzYyLDAsNSwyLjIzOCw1LDVWMzd6Ij48L3BhdGg+PHBhdGggZmlsbD0iI0ZGRiIgZD0iTTEyIDE5SDE3VjM2SDEyek0xNC40ODUgMTdoLS4wMjhDMTIuOTY1IDE3IDEyIDE1Ljg4OCAxMiAxNC40OTkgMTIgMTMuMDggMTIuOTk1IDEyIDE0LjUxNCAxMmMxLjUyMSAwIDIuNDU4IDEuMDggMi40ODYgMi40OTlDMTcgMTUuODg3IDE2LjAzNSAxNyAxNC40ODUgMTd6TTM2IDM2aC01di05LjA5OWMwLTIuMTk4LTEuMjI1LTMuNjk4LTMuMTkyLTMuNjk4LTEuNTAxIDAtMi4zMTMgMS4wMTItMi43MDcgMS45OUMyNC45NTcgMjUuNTQzIDI1IDI2LjUxMSAyNSAyN3Y5aC01VjE5aDV2Mi42MTZDMjUuNzIxIDIwLjUgMjYuODUgMTkgMjkuNzM4IDE5YzMuNTc4IDAgNi4yNjEgMi4yNSA2LjI2MSA3LjI3NEwzNiAzNiAzNiAzNnoiPjwvcGF0aD48L3N2Zz4=" style="max-width: 30px; padding: 0px 4px; cursor: pointer;" onclick="document.location.href='https://www.linkedin.com/in/raahilbadiani'"/>
-            </div>            
+        <div class="user-info">
+          <span class="habbo-motto">FUTZIN DOS TREINADORES</span>
         </div>
-    </div>
-    <script src="/libraries/jquery.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous">
-    </script>
+      </header>
+
+      <!-- Main Content Grid -->
+      <div class="habbo-content">
+        <!-- Bottom Row: Integrated Entrance & Queue Card -->
+        <section class="habbo-box entrance-integrated-box" style="flex: 1">
+          <div class="habbo-box-header">
+            <div class="habbo-box-title">ENTRAR NA ARENA & FILA DE ESPERA</div>
+            <span id="queue-count" class="queue-count-badge">0 jogadores</span>
+          </div>
+          <div class="habbo-box-content entrance-grid">
+            <div class="entrance-left">
+              <div class="status-bar">
+                <span class="status-label">STATUS:</span>
+                <span id="arena-status" class="status-value">CARREGANDO</span>
+              </div>
+
+              <form id="join-form" class="habbo-form">
+                <label for="player-name">Nick no Habbo:</label>
+                <div class="input-group">
+                  <input
+                    type="text"
+                    id="player-name"
+                    placeholder="Digite seu nick..."
+                    autocomplete="name"
+                    required
+                  />
+                  <button
+                    class="habbo-btn habbo-btn-green"
+                    id="join-btn"
+                    type="submit"
+                  >
+                    ENTRAR
+                  </button>
+                </div>
+              </form>
+              <p class="help-text" id="arena-copy">
+                Aguarde os treinadores abrirem a arena.
+              </p>
+
+              <section
+                class="lobby-info-grid"
+                aria-label="Informações da arena"
+              >
+                <article class="lobby-info-item">
+                  <img
+                    src="/assets/COMO_FUNCIONA.png"
+                    alt="Como Funciona"
+                    class="lobby-info-img useFilter"
+                  />
+                  <p>
+                    Uma arena unica para todo mundo: entram 5 no azul, 5 no
+                    vermelho, e o restante assiste enquanto aguarda a vez.
+                  </p>
+                </article>
+                <article class="lobby-info-item">
+                  <img
+                    src="/assets/REGRAS.png"
+                    alt="Regras"
+                    class="lobby-info-img useFilter"
+                  />
+                  <p>
+                    Ganha quem fizer 3 gols primeiro. O limite e 3 minutos; se
+                    terminar empatado, vira GOL DE OURO!
+                  </p>
+                </article>
+                <article class="lobby-info-item">
+                  <img
+                    src="/assets/DETALHES.png"
+                    alt="Detalhes"
+                    class="lobby-info-img useFilter"
+                  />
+                  <p>
+                    Cada gol vale 5 pontos para quem marcou. A vitória da equipe
+                    soma mais 2 pontos para todos do time vencedor.
+                  </p>
+                </article>
+                <article class="lobby-info-item">
+                  <img
+                    src="/assets/PREMAICAO.png"
+                    alt="Pontuação"
+                    class="lobby-info-img useFilter"
+                  />
+                  <div style="display: flex; flex-direction: column; gap: 4px">
+                    <div style="display: flex; align-items: center; gap: 10px">
+                      <img
+                        src="/assets/hc_gift_31days_icon.png"
+                        alt="hc"
+                        class="lobby-info"
+                      />
+                      <p><strong>1º Lugar:</strong> 02 HC's</p>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 10px">
+                      <img
+                        src="/assets/hc_gift_31days_icon.png"
+                        alt="hc"
+                        class="lobby-info"
+                      />
+                      <p><strong>2º Lugar:</strong> 01 HC's</p>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 10px">
+                      <img
+                        src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEi6eYXfWOm_amq_2dKYBeJZFyM9BCJLtq_sEaI0F1hhgLcPikaeknqZnvZsqc7hu6cp_cuJPhs3m3nyt6j-YaBGTAKcL_EK-AxS92LmRxiDKldLE8w5dL3f5UX7pILZQV9GY2eAo2Lz8S3b/s0/863__-543.png"
+                        alt="hc"
+                        class="lobby-info"
+                      />
+                      <p><strong>3º Lugar:</strong> 30 medalhas</p>
+                    </div>
+                  </div>
+                </article>
+              </section>
+              <!-- <p class="lobby-chat-note">O chat fica em tempo real ao lado do campo para jogadores e espectadores acompanharem tudo sem sair da arena.</p> -->
+            </div>
+            <div class="entrance-right">
+              <h3 class="queue-inner-title">Fila Atual</h3>
+              <div class="admin-list queue-scroll-area" id="queue-preview">
+                <!-- Populated via JS -->
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <!-- Footer -->
+      <footer class="habbo-footer">
+        <div class="footer-copy">Companhia dos Treinadores © 2026</div>
+        <div class="footer-credit">
+          <span>Desenvolvido por</span>
+          <img
+            src="https://www.habbo.com.br/habbo-imaging/avatarimage?user=mitojmcam&headonly=1&direction=2&head_direction=2&gesture=sml&size=s"
+            alt="mitojmcam"
+            class="footer-head"
+            loading="lazy"
+            referrerpolicy="no-referrer"
+          />
+          <strong>mitojmcam</strong>
+        </div>
+      </footer>
+    </main>
 
     <script src="/welcome/welcome.js"></script>
-    <script>
-        
-        if ('serviceWorker' in navigator) {
-            console.log("Will the service worker register?");
-            navigator.serviceWorker.register('/service-worker.js',{scope:'.'})
-                .then(function (reg) {
-                    console.log("Yes, it did.");
-                })
-                .catch(function (err) {
-                    console.log("No it didn't. This happened:", err)
-                });
-            addToHomescreen({modal:true,mandatory:true,logging:true,lifespan:100,displayPace:0.01
-                ,detectHomescreen:true});
-        }
-    </script>
-</body>
-
+  </body>
 </html>
