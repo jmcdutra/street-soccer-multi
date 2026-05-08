@@ -654,6 +654,119 @@
     }
 }
 
+@media (max-width: 980px) and (orientation: landscape) and (max-height: 640px) {
+    .arena-body {
+        overflow-y: auto;
+    }
+
+    .arena-shell {
+        height: auto;
+        min-height: 100svh;
+        grid-template-columns: 1fr;
+    }
+
+    .arena-stage {
+        min-height: 100svh;
+        height: 100svh;
+    }
+
+    #canvasDiv {
+        min-height: 100svh;
+        height: 100svh;
+    }
+
+    .arena-sidebar {
+        height: auto;
+        overflow: visible;
+        border-left: 0;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        padding: 8px 10px 14px;
+    }
+
+    .arena-hud {
+        top: 6px;
+        left: 6px;
+        right: 6px;
+        min-height: 38px;
+        grid-template-columns: auto 1fr auto;
+        gap: 6px;
+        padding: 4px 6px;
+        border-radius: 6px;
+    }
+
+    .hud-brand {
+        gap: 4px;
+    }
+
+    .hud-brand span {
+        display: none;
+    }
+
+    .hud-logo {
+        height: 22px;
+    }
+
+    .score-strip {
+        width: 100%;
+        grid-template-columns: 54px 34px 34px minmax(74px, 1fr);
+    }
+
+    .score-strip > * {
+        min-height: 28px;
+        font-size: 15px;
+    }
+
+    .score-status,
+    #time-left {
+        font-size: 11px;
+        padding: 0 8px;
+    }
+
+    .hud-actions {
+        gap: 4px;
+    }
+
+    .navbar-btn-my,
+    #home,
+    #help-btn,
+    #leave-btn,
+    #mute-btn {
+        min-height: 28px;
+        min-width: 28px;
+        padding: 0 4px !important;
+    }
+
+    .navbar-btn-my img {
+        width: 18px;
+        height: 18px;
+    }
+
+    #info,
+    .spectator-badge {
+        display: none !important;
+    }
+
+    #tackle {
+        right: 12px;
+        bottom: 12px;
+        min-height: 42px;
+        width: min(118px, calc(100vw - 24px));
+        padding: 7px 10px !important;
+    }
+
+    #tackle span {
+        font-size: 0.72rem;
+    }
+
+    #tackle small {
+        font-size: 0.52rem;
+    }
+
+    .side-panel {
+        min-height: auto;
+    }
+}
+
 @media (max-width: 760px) {
     .arena-hud {
         grid-template-columns: 1fr auto;

@@ -79,6 +79,7 @@ function statusLabel(status) {
         COUNTDOWN: "começando",
         PLAYING: "em jogo",
         GOLDEN_GOAL: "gol de ouro",
+        PAUSED: "pausado",
         BETWEEN_MATCH: "intervalo"
     };
     return labels[status] ?? status;

@@ -36,6 +36,11 @@ function leaveArena() {
     setTimeout(finish, 600);
 }
 
+function notifyLeaveSilently() {
+    if (!sock?.connected) return;
+    sock.emit('player:leave');
+}
+
 function isTypingTarget(event) {
     const tagName = event.target?.tagName;
     return event.target?.isContentEditable || ["INPUT", "TEXTAREA", "SELECT"].includes(tagName);
@@ -214,6 +219,9 @@ function setEventListener() {
         blurChatInput();
     });
 
+    window.addEventListener('pagehide', notifyLeaveSilently);
+    window.addEventListener('beforeunload', notifyLeaveSilently);
+
     document.querySelector('#left-area').style.display = 'none';
     document.querySelector('#right-area').style.display = 'none';
 }
@@ -315,6 +323,7 @@ function statusText(status) {
         COUNTDOWN: 'Começando',
         PLAYING: 'Em jogo',
         GOLDEN_GOAL: 'Gol de ouro',
+        PAUSED: 'Pausado',
         BETWEEN_MATCH: 'Intervalo'
     };
     return labels[status] ?? status;

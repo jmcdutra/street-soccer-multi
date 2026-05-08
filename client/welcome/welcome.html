@@ -36,7 +36,7 @@
     <link rel="icon" type="image/x-icon" href="/assets/favicon.ico" />
     <link rel="apple-touch-icon" href="/assets/favicon-192.png" />
     <!-- Custom Fonts are loaded in style.css -->
-    <link rel="stylesheet" href="/style.css" />
+    <link rel="stylesheet" href="/style.css?v=20260507-home-layout-2" />
   </head>
 
   <body>
@@ -60,7 +60,21 @@
       </div>
     </div>
 
-    <main class="habbo-lobby-container">
+    <div class="lobby-shell">
+      <aside
+        class="lobby-side lobby-side--left"
+        aria-hidden="true"
+        style="flex:0 0 clamp(140px,20vw,350px);display:flex;justify-content:center;align-items:flex-start;padding-top:96px"
+      >
+        <img
+          src="/assets/azul.png?v=20260507-home-layout-2"
+          alt=""
+          class="lobby-side-image"
+          style="display:block;width:clamp(140px,20vw,350px);height:auto;max-width:100%;image-rendering:pixelated"
+        />
+      </aside>
+
+      <main class="habbo-lobby-container">
       <!-- Header -->
       <header class="habbo-header">
         <div class="logo-area">
@@ -219,7 +233,21 @@
           <strong>mitojmcam</strong>
         </div>
       </footer>
-    </main>
+      </main>
+
+      <aside
+        class="lobby-side lobby-side--right"
+        aria-hidden="true"
+        style="flex:0 0 clamp(140px,20vw,350px);display:flex;justify-content:center;align-items:flex-start;padding-top:96px"
+      >
+        <img
+          src="/assets/vermelho.png?v=20260507-home-layout-2"
+          alt=""
+          class="lobby-side-image"
+          style="display:block;width:clamp(140px,20vw,350px);height:auto;max-width:100%;image-rendering:pixelated"
+        />
+      </aside>
+    </div>
 
     <script src="/welcome/welcome.js"></script>
   </body>

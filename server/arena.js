@@ -13,6 +13,7 @@ const STATUS = {
   COUNTDOWN: "COUNTDOWN",
   PLAYING: "PLAYING",
   GOLDEN_GOAL: "GOLDEN_GOAL",
+  PAUSED: "PAUSED",
   BETWEEN_MATCH: "BETWEEN_MATCH"
 };
 
@@ -38,6 +39,8 @@ class Arena {
     this.scoreA = 0;
     this.scoreB = 0;
     this.matchEndsAt = null;
+    this.matchRemainingMs = MATCH_SECONDS * 1000;
+    this.pausedFromStatus = null;
     this.intervalId = null;
     this.timeIntervalId = null;
     this.countdownTimeoutId = null;
@@ -80,6 +83,29 @@ class Arena {
     this.countdownTimeoutId = null;
     this.nextMatchTimeoutId = null;
     this.finishing = false;
+  }
+
+  resetMatchClock(remainingMs = MATCH_SECONDS * 1000) {
+    this.matchEndsAt = null;
+    this.matchRemainingMs = Math.max(0, remainingMs);
+    this.pausedFromStatus = null;
+  }
+
+  currentMatchRemainingMs() {
+    if (this.status === STATUS.GOLDEN_GOAL || this.pausedFromStatus === STATUS.GOLDEN_GOAL) return 0;
+    if (this.matchEndsAt) return Math.max(0, this.matchEndsAt - Date.now());
+    return Math.max(0, this.matchRemainingMs ?? MATCH_SECONDS * 1000);
+  }
+
+  startMatchClock() {
+    const remainingMs = Math.max(0, this.matchRemainingMs ?? MATCH_SECONDS * 1000);
+    this.matchRemainingMs = remainingMs;
+    this.matchEndsAt = Date.now() + remainingMs;
+  }
+
+  pauseMatchClock() {
+    this.matchRemainingMs = this.currentMatchRemainingMs();
+    this.matchEndsAt = null;
   }
 
   persistQueue() {
@@ -152,16 +178,19 @@ class Arena {
   disconnect(sock) {
     const name = sock.playerName;
     if (!name || !this.connections[name]) return;
-    if (this.connections[name].sockId === sock.id) {
-      this.connections[name].online = false;
-      this.connections[name].lastSeen = Date.now();
-      QueueEntryModel.updateOne({ name }, { $set: { online: false, lastSeen: new Date() } }).catch(() => {});
-    }
+    if (this.connections[name].sockId !== sock.id) return;
 
     const active = this.activeByName[name];
+    this.removeFromQueue(name);
+    if (active) this.removeActivePlayer(name, false);
+    delete this.connections[name];
+    sock.playerName = null;
+    QueueEntryModel.deleteOne({ name }).catch(() => {});
     if (active) {
-      this.removeActivePlayer(name, true);
+      this.handleActiveDeparture(active.team);
+      return;
     }
+    this.persistQueue();
     this.broadcastState();
   }
 
@@ -170,11 +199,15 @@ class Arena {
     if (!name) return;
     const active = this.activeByName[name];
 
-    this.queue = this.queue.filter((entry) => entry !== name);
+    this.removeFromQueue(name);
     if (active) this.removeActivePlayer(name, false);
     if (this.connections[name]?.sockId === sock.id) delete this.connections[name];
     sock.playerName = null;
     QueueEntryModel.deleteOne({ name }).catch(() => {});
+    if (active) {
+      this.handleActiveDeparture(active.team);
+      return;
+    }
     this.persistQueue();
     this.broadcastState();
   }
@@ -193,6 +226,28 @@ class Arena {
     }
   }
 
+  removeFromQueue(name) {
+    this.queue = this.queue.filter((entry) => entry !== name);
+  }
+
+  pruneQueue() {
+    const seen = new Set();
+    const nextQueue = [];
+    let changed = false;
+
+    for (const name of this.queue) {
+      if (!name || seen.has(name) || this.activeByName[name] || !this.isOnline(name)) {
+        changed = true;
+        continue;
+      }
+      seen.add(name);
+      nextQueue.push(name);
+    }
+
+    if (changed) this.queue = nextQueue;
+    return changed;
+  }
+
   dequeueOnline() {
     const index = this.queue.findIndex((name) => this.isOnline(name) && !this.activeByName[name]);
     if (index < 0) return null;
@@ -205,6 +260,10 @@ class Arena {
     return Object.values(this.activeByName).filter((entry) => entry.team === team).length;
   }
 
+  activePlayerCount() {
+    return Object.keys(this.activeByName).length;
+  }
+
   getBalancedTeam(nextIndex = 0) {
     const countA = this.activeCount("A");
     const countB = this.activeCount("B");
@@ -214,14 +273,24 @@ class Arena {
     return countA < countB ? "A" : "B";
   }
 
-  addActivePlayer(name, team) {
+  spawnPositionForTeam(team) {
+    const count = this.activeCount(team);
+    const formation = team === "A" ? basic_formation.teamL : basic_formation.teamR;
+    return formation[count % formation.length];
+  }
+
+  addActivePlayer(name, team, options = {}) {
     const connection = this.connections[name];
     if (!connection?.online) return false;
     const player = new Player(connection.sockId, Math.random() * C.Width, Math.random() * C.Height, C.playerRadius, false, name);
     player.teamName = team;
+    if (options.position !== false) {
+      const pos = options.position ?? this.spawnPositionForTeam(team);
+      player.reset(pos.x, pos.y);
+    }
     this.players[connection.sockId] = player;
     this.activeByName[name] = { sockId: connection.sockId, team };
-    this.resetFormation();
+    if (options.resetFormation !== false) this.resetFormation();
     return true;
   }
 
@@ -232,6 +301,54 @@ class Arena {
     delete this.activeByName[name];
     if (appendToQueue) this.enqueue(name);
     this.persistQueue();
+  }
+
+  promoteQueuedPlayer(team) {
+    if (this.activeCount(team) >= MAX_TEAM_SIZE) return false;
+    const index = this.queue.findIndex((name) => this.isOnline(name) && !this.activeByName[name]);
+    if (index < 0) return false;
+    const [name] = this.queue.splice(index, 1);
+    return this.addActivePlayer(name, team, { resetFormation: false });
+  }
+
+  requeueActivePlayersToFront() {
+    const activeNames = Object.keys(this.activeByName).filter((name) => this.isOnline(name));
+    const remainingQueue = this.queue.filter((name) => !activeNames.includes(name));
+    this.queue = [...activeNames, ...remainingQueue];
+  }
+
+  transitionToWaitingState() {
+    this.players = {};
+    this.activeByName = {};
+    this.ball.reset();
+    this.ballHolder = null;
+    this.lastShooterId = null;
+    this.scoreA = 0;
+    this.scoreB = 0;
+    this.resetMatchClock();
+    this.status = this.unlocked ? STATUS.WAITING : STATUS.LOCKED;
+    this.persistQueue();
+    this.broadcastState();
+  }
+
+  handleActiveDeparture(team) {
+    if (![STATUS.COUNTDOWN, STATUS.PLAYING, STATUS.GOLDEN_GOAL, STATUS.PAUSED].includes(this.status)) {
+      this.persistQueue();
+      this.broadcastState();
+      return;
+    }
+
+    if (team) this.promoteQueuedPlayer(team);
+    this.persistQueue();
+
+    if (this.activePlayerCount() < MIN_PLAYERS) {
+      this.clearScheduledTransitions();
+      this.requeueActivePlayersToFront();
+      this.transitionToWaitingState();
+      return;
+    }
+
+    this.broadcastState();
   }
 
   resetFormation(startTeam = "B") {
@@ -272,6 +389,8 @@ class Arena {
       return;
     }
 
+    if (this.pruneQueue()) this.persistQueue();
+
     for (const name of Object.keys(this.activeByName)) {
       this.removeActivePlayer(name, true);
     }
@@ -280,37 +399,36 @@ class Arena {
     this.activeByName = {};
     this.scoreA = 0;
     this.scoreB = 0;
-    this.matchEndsAt = null;
+    this.resetMatchClock();
 
     let picked = 0;
     while (picked < MAX_ACTIVE_PLAYERS) {
       const name = this.dequeueOnline();
       if (!name) break;
       const team = this.getBalancedTeam(picked);
-      if (this.addActivePlayer(name, team)) picked++;
+      if (this.addActivePlayer(name, team, { resetFormation: false })) picked++;
     }
 
     if (picked < MIN_PLAYERS) {
-      for (const name of Object.keys(this.activeByName)) {
-        this.removeActivePlayer(name, false);
-        this.queue.unshift(name);
-      }
-      this.players = {};
-      this.activeByName = {};
-      this.status = STATUS.WAITING;
-      this.persistQueue();
-      this.broadcastState();
+      this.requeueActivePlayersToFront();
+      this.transitionToWaitingState();
       return;
     }
 
+    this.resetFormation();
     this.persistQueue();
     this.status = STATUS.COUNTDOWN;
     this.broadcastState();
     this.io()?.in(ARENA_ROOM).emit("countDown", C.countDown);
     this.countdownTimeoutId = setTimeout(() => {
       if (this.status !== STATUS.COUNTDOWN) return;
+      if (this.activePlayerCount() < MIN_PLAYERS) {
+        this.requeueActivePlayersToFront();
+        this.transitionToWaitingState();
+        return;
+      }
       this.status = STATUS.PLAYING;
-      this.matchEndsAt = Date.now() + MATCH_SECONDS * 1000;
+      this.startMatchClock();
       this.broadcastState();
     }, C.countDown);
   }
@@ -335,7 +453,7 @@ class Arena {
     this.lastShooterId = null;
     this.scoreA = 0;
     this.scoreB = 0;
-    this.matchEndsAt = null;
+    this.resetMatchClock();
     this.status = STATUS.LOCKED;
     this.persistQueue();
     this.broadcastState();
@@ -343,18 +461,24 @@ class Arena {
 
   pause() {
     if ([STATUS.PLAYING, STATUS.GOLDEN_GOAL].includes(this.status)) {
-      this.status = STATUS.BETWEEN_MATCH;
-      this.matchEndsAt = null;
+      this.pausedFromStatus = this.status;
+      this.pauseMatchClock();
+      this.status = STATUS.PAUSED;
       this.broadcastState();
     }
   }
 
   resume() {
-    if (this.unlocked && this.status === STATUS.BETWEEN_MATCH && Object.keys(this.players).length >= MIN_PLAYERS) {
-      this.status = STATUS.PLAYING;
-      this.matchEndsAt = this.matchEndsAt ?? Date.now() + MATCH_SECONDS * 1000;
-      this.broadcastState();
+    if (!this.unlocked || this.status !== STATUS.PAUSED) return;
+    if (this.activePlayerCount() < MIN_PLAYERS) {
+      this.requeueActivePlayersToFront();
+      this.transitionToWaitingState();
+      return;
     }
+    this.status = this.pausedFromStatus === STATUS.GOLDEN_GOAL ? STATUS.GOLDEN_GOAL : STATUS.PLAYING;
+    this.pausedFromStatus = null;
+    if (this.status === STATUS.PLAYING) this.startMatchClock();
+    this.broadcastState();
   }
 
   async finishMatch(winnerTeam) {
@@ -383,7 +507,7 @@ class Arena {
     }
 
     this.status = STATUS.BETWEEN_MATCH;
-    this.matchEndsAt = null;
+    this.resetMatchClock(0);
     this.broadcastState();
     this.nextMatchTimeoutId = setTimeout(() => {
       this.finishing = false;
@@ -397,6 +521,7 @@ class Arena {
     if (this.scoreA === this.scoreB) {
       this.status = STATUS.GOLDEN_GOAL;
       this.matchEndsAt = null;
+      this.matchRemainingMs = 0;
       return;
     }
     this.finishMatch(this.scoreA > this.scoreB ? "A" : "B");
@@ -461,6 +586,7 @@ class Arena {
     if (scoringTeam === "A") this.scoreA++;
     else this.scoreB++;
     const matchIsOver = this.scoreA >= GOAL_TARGET || this.scoreB >= GOAL_TARGET || this.status === STATUS.GOLDEN_GOAL;
+    if (!matchIsOver) this.pauseMatchClock();
     this.status = matchIsOver ? STATUS.BETWEEN_MATCH : STATUS.COUNTDOWN;
 
     const scorer = this.players[this.lastShooterId];
@@ -486,8 +612,13 @@ class Arena {
     clearTimeout(this.countdownTimeoutId);
     this.countdownTimeoutId = setTimeout(() => {
       if (this.status === STATUS.COUNTDOWN) {
+        if (this.activePlayerCount() < MIN_PLAYERS) {
+          this.requeueActivePlayersToFront();
+          this.transitionToWaitingState();
+          return;
+        }
         this.status = STATUS.PLAYING;
-        this.matchEndsAt = Date.now() + MATCH_SECONDS * 1000;
+        this.startMatchClock();
         this.broadcastState();
       }
     }, C.countDown);
@@ -548,8 +679,7 @@ class Arena {
 
   timeLeft() {
     if (this.status === STATUS.GOLDEN_GOAL) return 0;
-    if (!this.matchEndsAt) return MATCH_SECONDS;
-    return Math.max(0, Math.ceil((this.matchEndsAt - Date.now()) / 1000));
+    return Math.ceil(this.currentMatchRemainingMs() / 1000);
   }
 
   nextByTeam() {
@@ -594,9 +724,13 @@ class Arena {
     return "spectator";
   }
 
-  emitState(sock) {
+  emitState(sock, state = null) {
+    if (!state) {
+      if (this.pruneQueue()) this.persistQueue();
+      state = this.publicState();
+    }
     sock.emit("arena:state", {
-      ...this.publicState(),
+      ...state,
       me: {
         name: sock.playerName ?? null,
         role: this.playerRole(sock.playerName),
@@ -608,8 +742,19 @@ class Arena {
   broadcastState() {
     const io = this.io();
     if (!io) return;
+    if (this.pruneQueue()) this.persistQueue();
+    const state = this.publicState();
     for (const sock of io.sockets.sockets.values()) {
-      if (sock.rooms.has(ARENA_ROOM)) this.emitState(sock);
+      if (sock.rooms.has(ARENA_ROOM)) {
+        sock.emit("arena:state", {
+          ...state,
+          me: {
+            name: sock.playerName ?? null,
+            role: this.playerRole(sock.playerName),
+            socketId: sock.id
+          }
+        });
+      }
     }
   }
 
@@ -618,6 +763,7 @@ class Arena {
   }
 
   async adminState() {
+    if (this.pruneQueue()) this.persistQueue();
     return {
       ...this.publicState(),
       ranking: await this.ranking()
@@ -648,7 +794,7 @@ class Arena {
     this.lastShooterId = null;
     this.scoreA = 0;
     this.scoreB = 0;
-    this.matchEndsAt = null;
+    this.resetMatchClock();
     this.broadcastState();
   }
 
@@ -660,8 +806,9 @@ class Arena {
 
   removePlayer(name) {
     const cleaned = this.cleanName(name);
-    this.queue = this.queue.filter((entry) => entry !== cleaned);
-    this.removeActivePlayer(cleaned, false);
+    const active = this.activeByName[cleaned];
+    this.removeFromQueue(cleaned);
+    if (active) this.removeActivePlayer(cleaned, false);
     const connection = this.connections[cleaned];
     delete this.connections[cleaned];
     const sock = connection?.sockId ? this.io()?.sockets.sockets.get(connection.sockId) : null;
@@ -670,6 +817,10 @@ class Arena {
       sock.disconnect(true);
     }
     QueueEntryModel.deleteOne({ name: cleaned }).catch(() => {});
+    if (active) {
+      this.handleActiveDeparture(active.team);
+      return;
+    }
     this.persistQueue();
     this.broadcastState();
   }
@@ -684,7 +835,7 @@ class Arena {
     this.lastShooterId = null;
     this.scoreA = 0;
     this.scoreB = 0;
-    this.matchEndsAt = null;
+    this.resetMatchClock();
     this.status = this.unlocked ? STATUS.WAITING : STATUS.LOCKED;
     this.persistQueue();
     this.broadcastState();
