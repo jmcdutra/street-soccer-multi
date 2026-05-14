@@ -83,6 +83,18 @@
     gap: 8px;
 }
 
+.hud-logo-area {
+    display: flex;
+    align-items: center;
+    padding-right: 4px;
+}
+
+.hud-logo {
+    height: 32px;
+    width: auto;
+    object-fit: contain;
+}
+
 .hud-score {
     display: flex;
     justify-content: center;
@@ -675,7 +687,7 @@
     }
 
     .hud-logo {
-        height: 22px;
+        height: 24px;
     }
 
     .score-strip {
