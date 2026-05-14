@@ -45,6 +45,7 @@ class Arena {
     this.timeIntervalId = null;
     this.countdownTimeoutId = null;
     this.nextMatchTimeoutId = null;
+    this.kickoffTeam = null;
     this.stateDirty = true;
     this.finishing = false;
     this.queuePersistRevision = 0;
@@ -323,6 +324,7 @@ class Arena {
     this.ball.reset();
     this.ballHolder = null;
     this.lastShooterId = null;
+    this.kickoffTeam = null;
     this.scoreA = 0;
     this.scoreB = 0;
     this.resetMatchClock();
@@ -401,10 +403,19 @@ class Arena {
     this.scoreB = 0;
     this.resetMatchClock();
 
-    let picked = 0;
-    while (picked < MAX_ACTIVE_PLAYERS) {
+    const candidates = [];
+    while (candidates.length < MAX_ACTIVE_PLAYERS) {
       const name = this.dequeueOnline();
       if (!name) break;
+      candidates.push(name);
+    }
+    // Shuffle so teams are randomized each match
+    for (let i = candidates.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [candidates[i], candidates[j]] = [candidates[j], candidates[i]];
+    }
+    let picked = 0;
+    for (const name of candidates) {
       const team = this.getBalancedTeam(picked);
       if (this.addActivePlayer(name, team, { resetFormation: false })) picked++;
     }
@@ -428,6 +439,7 @@ class Arena {
         return;
       }
       this.status = STATUS.PLAYING;
+      this.kickoffTeam = "B"; // matches resetFormation() default
       this.startMatchClock();
       this.broadcastState();
     }, C.countDown);
@@ -451,6 +463,7 @@ class Arena {
     this.ball.reset();
     this.ballHolder = null;
     this.lastShooterId = null;
+    this.kickoffTeam = null;
     this.scoreA = 0;
     this.scoreB = 0;
     this.resetMatchClock();
@@ -533,6 +546,7 @@ class Arena {
     if (!player) return;
     player.thetaHandler(mouse.x, mouse.y);
     if (!this.ball.isCollide(player)) return;
+    if (this.kickoffTeam && player.teamName === this.kickoffTeam) this.kickoffTeam = null;
     const theta = player.theta;
     const radSum = 1 + C.playerRadius + C.ballBigRadius;
     this.ball.x = player.x + Math.cos(theta) * radSum;
@@ -576,6 +590,9 @@ class Arena {
       }
     }
 
+    if (this.kickoffTeam && newHolder && this.players[newHolder]?.teamName === this.kickoffTeam) {
+      this.kickoffTeam = null;
+    }
     if (isGoal) this.handleGoal(isGoal);
     this.ballHolder = newHolder;
   }
@@ -589,13 +606,24 @@ class Arena {
     if (!matchIsOver) this.pauseMatchClock();
     this.status = matchIsOver ? STATUS.BETWEEN_MATCH : STATUS.COUNTDOWN;
 
+    // Award points to everyone on the scoring team
+    const scoringTeamNames = Object.entries(this.activeByName)
+      .filter(([, data]) => data.team === scoringTeam)
+      .map(([name]) => name);
+    if (scoringTeamNames.length) {
+      PlayerProfileModel.updateMany(
+        { name: { $in: scoringTeamNames } },
+        { $inc: { points: 5 }, $set: { lastSeen: new Date() } }
+      ).catch((err) => console.log("Arena goal team update failed:", err.message));
+    }
+    // Award goal stat only to the actual scorer
     const scorer = this.players[this.lastShooterId];
     if (scorer?.teamName === scoringTeam) {
       PlayerProfileModel.updateOne(
         { name: scorer.username },
-        { $inc: { points: 5, goals: 1 }, $set: { lastSeen: new Date() } },
+        { $inc: { goals: 1 }, $set: { lastSeen: new Date() } },
         { upsert: true }
-      ).catch((err) => console.log("Arena goal update failed:", err.message));
+      ).catch((err) => console.log("Arena goal scorer update failed:", err.message));
     }
 
     this.io()?.in(ARENA_ROOM).emit("score", { scoreA: this.scoreA, scoreB: this.scoreB });
@@ -618,6 +646,7 @@ class Arena {
           return;
         }
         this.status = STATUS.PLAYING;
+        this.kickoffTeam = goalSide; // team scored against gets the kickoff
         this.startMatchClock();
         this.broadcastState();
       }
@@ -633,8 +662,15 @@ class Arena {
 
     const players = Object.values(this.players);
     for (const player of players) {
-      player.update();
-      player.wallCollide();
+      if (this.kickoffTeam !== null && player.teamName !== this.kickoffTeam) {
+        player.vx = 0;
+        player.vy = 0;
+        player.ax = 0;
+        player.ay = 0;
+      } else {
+        player.update();
+        player.wallCollide();
+      }
     }
     for (let i = 0; i < players.length; i++) {
       for (let j = i + 1; j < players.length; j++) {
@@ -792,6 +828,7 @@ class Arena {
     this.ball.reset();
     this.ballHolder = null;
     this.lastShooterId = null;
+    this.kickoffTeam = null;
     this.scoreA = 0;
     this.scoreB = 0;
     this.resetMatchClock();
@@ -833,6 +870,7 @@ class Arena {
     this.ball.reset();
     this.ballHolder = null;
     this.lastShooterId = null;
+    this.kickoffTeam = null;
     this.scoreA = 0;
     this.scoreB = 0;
     this.resetMatchClock();
