@@ -325,21 +325,29 @@ function nameWithHead(name) {
     return `<span class="name-with-head">${habboHead(name)}<span>${escapeHtml(name)}</span></span>`;
 }
 
-function renderMiniList(id, names, emptyText) {
+const _htmlCache = {};
+function setInnerHTMLCached(id, html) {
+    if (_htmlCache[id] === html) return;
+    _htmlCache[id] = html;
     const el = document.getElementById(id);
-    el.innerHTML = names.map((entry) => {
+    if (el) el.innerHTML = html;
+}
+
+function renderMiniList(id, names, emptyText) {
+    const html = names.map((entry) => {
         const name = typeof entry === 'string' ? entry : entry.name;
         return `<div class="mini-item">${nameWithHead(name)}</div>`;
     }).join('') || `<div class="mini-item"><small>${emptyText}</small></div>`;
+    setInnerHTMLCached(id, html);
 }
 
 function renderQueue(queue) {
-    const el = document.getElementById('queue-list');
-    el.innerHTML = queue.slice(0, 12).map((entry) => `
+    const html = queue.slice(0, 12).map((entry) => `
         <div class="queue-item">
             <span class="queue-name"><small>#${entry.index}</small>${nameWithHead(entry.name)}</span>
         </div>
     `).join('') || '<div class="queue-item"><small>Fila vazia</small></div>';
+    setInnerHTMLCached('queue-list', html);
 }
 
 function fmtTime(seconds) {
@@ -411,7 +419,7 @@ function renderArenaState(state) {
     document.getElementById('scoreboard-a').innerText = state.scoreA;
     document.getElementById('scoreboard-b').innerText = state.scoreB;
     document.getElementById('time-left').innerText = state.status === 'GOLDEN_GOAL' ? 'golden' : fmtTime(state.timeLeft);
-    document.getElementById('player-name-label').innerHTML = state.me?.name ? nameWithHead(state.me.name) : 'Espectador';
+    setInnerHTMLCached('player-name-label', state.me?.name ? nameWithHead(state.me.name) : 'Espectador');
 
     renderMiniList('active-a', state.active.filter(p => p.team === 'A'), 'Sem jogadores');
     renderMiniList('active-b', state.active.filter(p => p.team === 'B'), 'Sem jogadores');
@@ -434,13 +442,16 @@ function renderArenaState(state) {
 }
 
 function renderChat(messages) {
-    const log = document.getElementById('chat-log');
-    log.innerHTML = messages.map((message) => `
+    const html = messages.map((message) => `
         <div class="chat-message">
             <strong>${nameWithHead(message.name)}</strong>
             <p>${escapeHtml(message.text)}</p>
         </div>
     `).join('');
+    if (_htmlCache['chat-log'] === html) return;
+    _htmlCache['chat-log'] = html;
+    const log = document.getElementById('chat-log');
+    log.innerHTML = html;
     log.scrollTop = log.scrollHeight;
 }
 
