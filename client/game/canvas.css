@@ -811,37 +811,70 @@
     }
 
     .arena-hud {
-        grid-template-columns: 1fr;
-        top: 8px;
-        left: 8px;
-        right: 8px;
+        grid-template-columns: 1fr auto;
+        top: 6px;
+        left: 6px;
+        right: 6px;
+        min-height: 38px;
         gap: 6px;
-    }
-
-    .score-strip {
-        grid-template-columns: 62px 40px 40px minmax(92px, auto);
+        padding: 4px 8px;
     }
 
     .hud-brand {
         display: none;
     }
 
-    .hud-score,
+    .hud-score {
+        justify-content: flex-start;
+    }
+
+    .score-strip {
+        width: 100%;
+        grid-template-columns: 52px 36px 36px minmax(72px, 1fr);
+    }
+
+    .score-strip > * {
+        min-height: 30px;
+        font-size: 15px;
+    }
+
+    .score-status,
+    #time-left {
+        font-size: 10px;
+        padding: 0 6px;
+    }
+
     .hud-actions {
-        justify-content: center;
+        gap: 4px;
+        justify-content: flex-end;
+    }
+
+    .navbar-btn-my,
+    #home,
+    #help-btn,
+    #leave-btn,
+    #mute-btn {
+        min-height: 30px;
+        min-width: 30px;
+        padding: 0 4px !important;
+    }
+
+    .navbar-btn-my img {
+        width: 18px;
+        height: 18px;
     }
 
     #info {
-        top: 106px;
-        right: 12px;
+        top: 58px;
+        right: 10px;
         left: auto;
         flex-direction: row;
         justify-content: flex-end;
     }
 
     .spectator-badge {
-        top: 150px;
-        left: 12px;
+        top: 58px;
+        left: 10px;
         max-width: calc(100vw - 24px);
         min-height: 0;
         padding: 8px 12px;
@@ -902,7 +935,7 @@
     }
 
     #info {
-        top: 102px;
+        top: 56px;
         gap: 6px;
     }
 
@@ -913,7 +946,7 @@
     }
 
     .spectator-badge {
-        top: 144px;
+        top: 56px;
     }
 
     #tackle {

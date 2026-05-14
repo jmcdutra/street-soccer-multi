@@ -159,6 +159,7 @@ function setEventListener() {
 
     joystick.addEventListener('touchStartValidation', (e) => {
         if (!canControl) return false;
+        if (e.touches.length >= 2) return false;
         var touch = e.changedTouches[0];
         return touch.pageX < window.innerWidth / 2;
     });
@@ -175,9 +176,39 @@ function setEventListener() {
 
     shootingBtn.addEventListener('touchStartValidation', (e) => {
         if (!canControl) return false;
+        if (e.touches.length >= 2) return false;
         var touch = e.changedTouches[0];
         return touch.pageX > window.innerWidth / 2;
     });
+
+    // Pinch-to-zoom on the game canvas
+    let pinchStartDist = null;
+    let pinchStartScale = null;
+
+    canvasDiv.addEventListener('touchstart', (e) => {
+        if (e.touches.length >= 2) {
+            const dx = e.touches[0].clientX - e.touches[1].clientX;
+            const dy = e.touches[0].clientY - e.touches[1].clientY;
+            pinchStartDist = Math.hypot(dx, dy);
+            pinchStartScale = Cam.scale;
+        }
+    }, { passive: true });
+
+    canvasDiv.addEventListener('touchmove', (e) => {
+        if (e.touches.length >= 2 && pinchStartDist !== null) {
+            const dx = e.touches[0].clientX - e.touches[1].clientX;
+            const dy = e.touches[0].clientY - e.touches[1].clientY;
+            const dist = Math.hypot(dx, dy);
+            Cam.scale = clamp(pinchStartScale * (dist / pinchStartDist), 0.6, 2.8);
+        }
+    }, { passive: true });
+
+    canvasDiv.addEventListener('touchend', (e) => {
+        if (e.touches.length < 2) {
+            pinchStartDist = null;
+            pinchStartScale = null;
+        }
+    }, { passive: true });
 
     muteBtn.addEventListener('click', () => {
         mute = 1 - mute;
