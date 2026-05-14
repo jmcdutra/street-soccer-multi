@@ -58,10 +58,9 @@
     left: 50%;
     transform: translateX(-50%);
     z-index: 5;
-    width: max-content;
+    display: inline-flex;
     max-width: calc(100% - 20px);
     min-height: 44px;
-    display: flex;
     align-items: center;
     gap: 8px;
     padding: 5px 10px;
@@ -78,21 +77,10 @@
     image-rendering: pixelated;
 }
 
-.hud-brand,
 .hud-actions {
     display: flex;
     align-items: center;
     gap: 8px;
-    min-width: 0;
-}
-
-.hud-brand span {
-    display: none;
-}
-
-.hud-logo {
-    height: 30px;
-    flex: 0 0 auto;
 }
 
 .hud-score {
@@ -784,10 +772,6 @@
         min-height: 36px;
         gap: 5px;
         padding: 3px 8px;
-    }
-
-    .hud-brand {
-        display: none;
     }
 
     .score-strip {
