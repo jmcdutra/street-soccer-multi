@@ -54,16 +54,17 @@
 
 .arena-hud {
     position: absolute;
-    top: 12px;
-    left: 12px;
-    right: 12px;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
     z-index: 5;
-    min-height: 48px;
-    display: grid;
-    grid-template-columns: minmax(160px, 1fr) auto minmax(180px, 1fr);
+    width: max-content;
+    max-width: calc(100% - 20px);
+    min-height: 44px;
+    display: flex;
     align-items: center;
-    gap: 10px;
-    padding: 8px 12px;
+    gap: 8px;
+    padding: 5px 10px;
     background: var(--habbo-box-bg);
     border: 2px solid #000;
     border-radius: 8px;
@@ -86,15 +87,7 @@
 }
 
 .hud-brand span {
-    overflow: hidden;
-    color: #cc1b1b;
-    font-family: var(--font-pixel);
-    font-size: 22px;
-    font-weight: 900;
-    text-overflow: ellipsis;
-    text-shadow: 1px 1px 0 #000;
-    text-transform: uppercase;
-    white-space: nowrap;
+    display: none;
 }
 
 .hud-logo {
@@ -113,7 +106,7 @@
 
 .score-strip {
     display: inline-grid;
-    grid-template-columns: 74px 48px 48px minmax(104px, auto);
+    grid-template-columns: 68px 44px 44px 88px;
     overflow: hidden;
     border: 2px solid #000;
     border-radius: 4px;
@@ -132,13 +125,15 @@
 }
 
 .score-status {
-    min-width: 104px;
-    padding: 0 12px;
+    padding: 0 6px;
     color: #000;
     background: #e4e2df;
-    font-size: 14px;
+    font-size: 12px;
     text-shadow: none;
     text-transform: uppercase;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 #scoreboard-a {
@@ -179,7 +174,7 @@
 #info {
     position: absolute;
     right: 20px;
-    top: 78px;
+    top: 66px;
     z-index: 4;
     display: flex !important;
     gap: 8px;
@@ -202,7 +197,7 @@
 
 .spectator-badge {
     position: absolute;
-    top: 80px;
+    top: 66px;
     left: 20px;
     z-index: 4;
     max-width: min(420px, calc(100vw - 40px));
@@ -685,21 +680,10 @@
 
     .arena-hud {
         top: 6px;
-        left: 6px;
-        right: 6px;
-        min-height: 38px;
-        grid-template-columns: auto 1fr auto;
-        gap: 6px;
-        padding: 4px 6px;
+        min-height: 36px;
+        gap: 5px;
+        padding: 3px 7px;
         border-radius: 6px;
-    }
-
-    .hud-brand {
-        gap: 4px;
-    }
-
-    .hud-brand span {
-        display: none;
     }
 
     .hud-logo {
@@ -707,23 +691,22 @@
     }
 
     .score-strip {
-        width: 100%;
-        grid-template-columns: 54px 34px 34px minmax(74px, 1fr);
+        grid-template-columns: 50px 32px 32px 72px;
     }
 
     .score-strip > * {
         min-height: 28px;
-        font-size: 15px;
+        font-size: 14px;
     }
 
     .score-status,
     #time-left {
-        font-size: 11px;
-        padding: 0 8px;
+        font-size: 10px;
+        padding: 0 5px;
     }
 
     .hud-actions {
-        gap: 4px;
+        gap: 3px;
     }
 
     .navbar-btn-my,
@@ -768,29 +751,15 @@
 }
 
 @media (max-width: 760px) {
-    .arena-hud {
-        grid-template-columns: 1fr auto;
-        gap: 8px;
-        padding: 8px 10px;
-    }
-
-    .hud-brand {
-        grid-column: 1 / -1;
-    }
-
-    .hud-brand span {
-        font-size: 18px;
-    }
-
     #info {
-        top: 124px;
+        top: 62px;
         right: 12px;
         flex-direction: column;
         align-items: flex-end;
     }
 
     .spectator-badge {
-        top: 124px;
+        top: 62px;
         left: 12px;
         max-width: calc(100vw - 118px);
     }
@@ -811,42 +780,29 @@
     }
 
     .arena-hud {
-        grid-template-columns: 1fr auto;
         top: 6px;
-        left: 6px;
-        right: 6px;
-        min-height: 38px;
-        gap: 6px;
-        padding: 4px 8px;
+        min-height: 36px;
+        gap: 5px;
+        padding: 3px 8px;
     }
 
     .hud-brand {
         display: none;
     }
 
-    .hud-score {
-        justify-content: flex-start;
-    }
-
     .score-strip {
-        width: 100%;
-        grid-template-columns: 52px 36px 36px minmax(72px, 1fr);
+        grid-template-columns: 52px 36px 36px 76px;
     }
 
     .score-strip > * {
         min-height: 30px;
-        font-size: 15px;
+        font-size: 14px;
     }
 
     .score-status,
     #time-left {
         font-size: 10px;
-        padding: 0 6px;
-    }
-
-    .hud-actions {
-        gap: 4px;
-        justify-content: flex-end;
+        padding: 0 5px;
     }
 
     .navbar-btn-my,
@@ -865,7 +821,7 @@
     }
 
     #info {
-        top: 58px;
+        top: 54px;
         right: 10px;
         left: auto;
         flex-direction: row;
@@ -873,7 +829,7 @@
     }
 
     .spectator-badge {
-        top: 58px;
+        top: 54px;
         left: 10px;
         max-width: calc(100vw - 24px);
         min-height: 0;
@@ -907,17 +863,16 @@
 
 @media (max-width: 420px) {
     .score-strip {
-        width: 100%;
-        grid-template-columns: 54px 38px 38px minmax(82px, 1fr);
+        grid-template-columns: 48px 34px 34px 68px;
     }
 
     .score-strip > * {
-        font-size: 16px;
+        font-size: 13px;
     }
 
     .score-status,
     #time-left {
-        font-size: 11px;
+        font-size: 10px;
     }
 
     .navbar-btn-my,
